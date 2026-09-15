@@ -1,0 +1,15 @@
+{
+  "type": "goety:ritual",
+  "ritual_type": "goety:craft",
+  "activation_item": { "item": "create:large_water_wheel" },
+  "craftType": "forge",
+  "soulCost": 256,
+  "duration": 16,
+  "ingredients": [
+    { "item": "goety:haunted_jug" },
+    { "item": "goety:tidal_focus" },
+    { "item": "create:windmill_bearing" },
+    { "tag": "croety:waving_sails" }
+  ],
+  "result": { "item": "croety:waving_focus" }
+}

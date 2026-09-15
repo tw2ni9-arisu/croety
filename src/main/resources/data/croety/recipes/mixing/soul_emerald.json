@@ -1,0 +1,27 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "fluid": "croety:fluid_soul",
+      "amount": 25
+    },
+    {
+      "item": "minecraft:emerald"
+    },
+    {
+      "item": "minecraft:emerald"
+    },
+    {
+      "item": "minecraft:emerald"
+    },
+    {
+      "item": "minecraft:emerald"
+    }
+  ],
+  "results": [
+    {
+      "item": "goety:soul_emerald",
+      "count": 4
+    }
+  ]
+}

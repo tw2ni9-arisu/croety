@@ -1,0 +1,11 @@
+{
+  "block.croety.soul_motor": "灵魂马达",
+  "item.croety.waving_focus": "涌动聚晶",
+  "item.croety.fluid_soul_bucket": "液态灵魂桶",
+  "fluid.croety.fluid_soul": "液态灵魂",
+  "entity.croety.soul_energy_orb": "灵魂能量球",
+  "itemGroup.croety.demo": "Croety 联动演示",
+  "spell.croety.waving": "涌动",
+  "croety.goggles.lifetime.permanent": "剩余寿命：永久",
+  "croety.goggles.lifetime.remaining": "剩余寿命：%s:%s"
+}

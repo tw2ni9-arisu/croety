@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "item": "minecraft:soul_sand"
+    }
+  ],
+  "results": [
+    {
+      "fluid": "croety:fluid_soul",
+      "amount": 25
+    }
+  ],
+  "heatRequirement": "heated"
+}

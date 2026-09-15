@@ -1,0 +1,49 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# Locally staged mod jars that have no public Maven (Goety).
+# Re-create them with: pwsh -File tools/fetch-deps.ps1
+libs/maven
+
+# Dependency source jars + ForgeFlower decompilation cache, used by
+# tools/find-api.ps1 -Source. Re-create with: pwsh -File tools/fetch-deps.ps1
+libs/sources
+
+# Image-generation drafts and temporary previews. Final project textures remain tracked.
+TEXTURES_MODELS/**/generated-*.png
+TEXTURES_MODELS/**/reference-preview.png
+TEXTURES_MODELS/**/v2/generated-v2.png
+TEXTURES_MODELS/**/v2/user-reference.png
+TEXTURES_MODELS/**/v2/waving_focus.png
+TEXTURES_MODELS/**/v2/preview.png
+
+# Local release staging and generated reports.
+release-staging
+*.sha256
+
+# Local agent planning/review notes and reference-only source assets.
+docs/superpowers
+TEXTURES_MODELS/needed

@@ -1,0 +1,42 @@
+[
+  {
+    "texture": "creative_casing",
+    "width": 16,
+    "height": 16,
+    "visiblePixels": 256,
+    "visibleAlpha": 89,
+    "opacityPercent": 34.90196078431372
+  },
+  {
+    "texture": "creative_motor",
+    "width": 16,
+    "height": 16,
+    "visiblePixels": 238,
+    "visibleAlpha": 89,
+    "opacityPercent": 34.90196078431372
+  },
+  {
+    "texture": "flap_display_front",
+    "width": 16,
+    "height": 16,
+    "visiblePixels": 256,
+    "visibleAlpha": 89,
+    "opacityPercent": 34.90196078431372
+  },
+  {
+    "texture": "axis",
+    "width": 16,
+    "height": 16,
+    "visiblePixels": 64,
+    "visibleAlpha": 89,
+    "opacityPercent": 34.90196078431372
+  },
+  {
+    "texture": "axis_top",
+    "width": 16,
+    "height": 16,
+    "visiblePixels": 16,
+    "visibleAlpha": 89,
+    "opacityPercent": 34.90196078431372
+  }
+]

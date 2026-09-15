@@ -1,0 +1,15 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "item": "goety:ectoplasm"
+    }
+  ],
+  "results": [
+    {
+      "fluid": "croety:fluid_soul",
+      "amount": 5
+    }
+  ],
+  "heatRequirement": "heated"
+}

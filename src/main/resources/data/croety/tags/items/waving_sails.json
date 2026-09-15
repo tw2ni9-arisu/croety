@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "create:white_sail",
+    "create:sail_frame",
+    "#minecraft:wool"
+  ]
+}
