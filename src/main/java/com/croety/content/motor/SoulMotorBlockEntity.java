@@ -2,6 +2,7 @@ package com.croety.content.motor;
 
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
@@ -106,8 +107,8 @@ public class SoulMotorBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+    protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(tag, registries, clientPacket);
         if (owner != null) {
             tag.putUUID("MotorOwner", owner);
             tag.putLong("MotorRecord", recordId);
@@ -116,8 +117,8 @@ public class SoulMotorBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
+    protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(tag, registries, clientPacket);
         owner = tag.hasUUID("MotorOwner") ? tag.getUUID("MotorOwner") : null;
         recordId = tag.getLong("MotorRecord");
         expiresAt = tag.getLong("MotorExpires");

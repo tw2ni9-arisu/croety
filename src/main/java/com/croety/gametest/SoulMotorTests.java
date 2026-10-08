@@ -12,23 +12,24 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 @GameTestHolder("croety")
 @PrefixGameTestTemplate(false)
 public class SoulMotorTests {
     @GameTest(template = "empty")
     public static void motorAndFocusAreRegistered(GameTestHelper helper) {
-        helper.assertTrue(ForgeRegistries.BLOCKS.containsKey(new ResourceLocation("croety", "soul_motor")), "灵魂马达必须注册");
-        helper.assertTrue(ForgeRegistries.ITEMS.containsKey(new ResourceLocation("croety", "waving_focus")), "涌动聚晶必须注册");
+        helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(ResourceLocation.fromNamespaceAndPath("croety", "soul_motor")), "灵魂马达必须注册");
+        helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ResourceLocation.fromNamespaceAndPath("croety", "waving_focus")), "涌动聚晶必须注册");
         helper.succeed();
     }
 
@@ -78,7 +79,7 @@ public class SoulMotorTests {
             motor.setSummoned(owner, id, helper.getLevel().getServer().overworld().getGameTime() + SoulMotorData.LIFETIME);
         }
         helper.assertTrue(data.activeCount(owner) == 3, "第四台应淘汰最早一台");
-        CompoundTag saved = data.save(new CompoundTag());
+        CompoundTag saved = data.save(new CompoundTag(), helper.getLevel().registryAccess());
         helper.assertTrue(saved.getList("Motors", 10).stream().anyMatch(tag -> ((CompoundTag) tag).getBoolean("Removed")),
                 "淘汰标记必须持久化，供区块重新加载后清除");
         data.tick(helper.getLevel().getServer());
@@ -97,25 +98,26 @@ public class SoulMotorTests {
 
     @GameTest(template = "empty")
     public static void forgeRitualUsesWaterWheelAndAllSailVariants(GameTestHelper helper) {
-        var recipe = helper.getLevel().getRecipeManager().byKey(new ResourceLocation("croety", "waving_focus")).orElse(null);
+        var recipe = helper.getLevel().getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("croety", "waving_focus"))
+                .map(RecipeHolder::value).orElse(null);
         helper.assertTrue(recipe instanceof RitualRecipe, "涌动聚晶锻造仪式必须载入");
         RitualRecipe ritual = (RitualRecipe) recipe;
         helper.assertTrue("forge".equals(ritual.getCraftType()) && ritual.getSoulCost() == 256 && ritual.getDuration() == 16,
                 "仪式需每秒256灵魂并持续16秒");
-        helper.assertTrue(ritual.getActivationItem().test(new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("create", "large_water_wheel")))),
+        helper.assertTrue(ritual.getActivationItem().test(new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("create", "large_water_wheel")))),
                 "中心物品必须是大型水车");
         List<String> colors = List.of("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
                 "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black");
         for (String color : colors) {
-            var sail = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("create", color + "_sail"));
+            var sail = BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("create", color + "_sail"));
             helper.assertTrue(ritual.getIngredients().stream().anyMatch(ingredient -> ingredient.test(
                     new ItemStack(sail.asItem()))), "仪式必须接受" + color + "风帆对应的物品");
         }
         helper.assertTrue(ritual.getIngredients().stream().anyMatch(ingredient -> ingredient.test(
-                new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("create", "sail_frame"))))),
+                new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("create", "sail_frame"))))),
                 "仪式必须接受风帆框架");
-        for (var sail : ForgeRegistries.BLOCKS.tags().getTag(com.simibubi.create.AllTags.AllBlockTags.WINDMILL_SAILS.tag)) {
-            helper.assertTrue(ritual.getIngredients().stream().anyMatch(ingredient -> ingredient.test(new ItemStack(sail.asItem()))),
+        for (var sail : BuiltInRegistries.BLOCK.getTagOrEmpty(com.simibubi.create.AllTags.AllBlockTags.WINDMILL_SAILS.tag)) {
+            helper.assertTrue(ritual.getIngredients().stream().anyMatch(ingredient -> ingredient.test(new ItemStack(sail.value().asItem()))),
                     "仪式物品标签必须覆盖Create本体风帆方块标签对应的物品");
         }
         helper.succeed();

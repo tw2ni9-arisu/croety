@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -18,11 +19,12 @@ import net.minecraft.world.level.saveddata.SavedData;
 /** 跨维度记录已施法的马达；卸载区块中的淘汰和到期记录会等待区块加载再删除。 */
 public class SoulMotorData extends SavedData {
     public static final long LIFETIME = 20L * 60 * 10;
+    public static final SavedData.Factory<SoulMotorData> FACTORY = new SavedData.Factory<>(SoulMotorData::new, SoulMotorData::load);
     private final List<Entry> entries = new ArrayList<>();
     private long nextId = 1;
 
     public static SoulMotorData get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(SoulMotorData::load, SoulMotorData::new, "croety_soul_motors");
+        return server.overworld().getDataStorage().computeIfAbsent(FACTORY, "croety_soul_motors");
     }
 
     public long add(UUID owner, ServerLevel level, BlockPos pos) {
@@ -57,7 +59,7 @@ public class SoulMotorData extends SavedData {
                 entry.removed = true;
                 setDirty();
             }
-            ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(entry.dimension));
+            ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(entry.dimension));
             ServerLevel level = server.getLevel(key);
             if (level == null || !level.hasChunkAt(entry.pos))
                 continue;
@@ -74,7 +76,7 @@ public class SoulMotorData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putLong("NextId", nextId);
         ListTag list = new ListTag();
         for (Entry entry : entries) {
@@ -91,7 +93,7 @@ public class SoulMotorData extends SavedData {
         return tag;
     }
 
-    private static SoulMotorData load(CompoundTag tag) {
+    private static SoulMotorData load(CompoundTag tag, HolderLookup.Provider registries) {
         SoulMotorData data = new SoulMotorData();
         data.nextId = Math.max(1, tag.getLong("NextId"));
         ListTag list = tag.getList("Motors", 10);

@@ -10,6 +10,7 @@ import com.croety.content.motor.SoulMotorData;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -19,8 +20,8 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.common.util.BlockSnapshot;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.common.util.BlockSnapshot;
 
 public class WavingSpell extends Spell {
     @Override
@@ -44,7 +45,7 @@ public class WavingSpell extends Spell {
     }
 
     @Override
-    public List<Enchantment> acceptedEnchantments() {
+    public List<ResourceKey<Enchantment>> acceptedEnchantments() {
         return List.of();
     }
 
@@ -65,7 +66,7 @@ public class WavingSpell extends Spell {
         if (!level.isUnobstructed(motorState, pos, net.minecraft.world.phys.shapes.CollisionContext.of(player))) return;
         BlockSnapshot snapshot = BlockSnapshot.create(level.dimension(), level, pos);
         if (!level.setBlock(pos, motorState, 3)) return;
-        if (ForgeEventFactory.onBlockPlace(player, snapshot, facing)) {
+        if (EventHooks.onBlockPlace(player, snapshot, facing)) {
             snapshot.restore();
             return;
         }

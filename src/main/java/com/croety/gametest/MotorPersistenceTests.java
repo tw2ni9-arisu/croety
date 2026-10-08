@@ -6,10 +6,8 @@ import com.croety.content.motor.SoulMotorBlockEntity;
 import com.croety.content.motor.SoulMotorData;
 import com.mojang.authlib.GameProfile;
 import com.simibubi.create.AllItems;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -28,9 +26,10 @@ import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.common.IOUtilities;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 @GameTestHolder("croety")
 @PrefixGameTestTemplate(false)
@@ -55,9 +54,9 @@ public class MotorPersistenceTests {
                 ids[i] = data.add(owner, overworld, pos);
                 motor.setSummoned(owner, ids[i], overworld.getGameTime() + SoulMotorData.LIFETIME);
                 if (i == 1) {
-                    CompoundTag motorTag = motor.saveWithFullMetadata();
+                    CompoundTag motorTag = motor.saveWithFullMetadata(overworld.registryAccess());
                     SoulMotorBlockEntity loadedMotor = new SoulMotorBlockEntity(pos, motor.getBlockState());
-                    loadedMotor.load(motorTag);
+                    loadedMotor.loadWithComponents(motorTag, overworld.registryAccess());
                     helper.assertTrue(owner.equals(loadedMotor.getOwner()) && loadedMotor.getRecordId() == ids[i]
                                     && loadedMotor.getExpiresAt() == motor.getExpiresAt(),
                             "方块实体保存加载应保留所属玩家、记录号和到期时间");
@@ -70,21 +69,14 @@ public class MotorPersistenceTests {
 
             DimensionDataStorage storage = overworld.getDataStorage();
             storage.save();
+            // NeoForge异步写盘，重建读取器前等待本轮保存真正完成。
+            IOUtilities.waitUntilIOWorkerComplete();
             Path dataDir = overworld.getServer().getWorldPath(LevelResource.ROOT).resolve("data");
-            Method load = SoulMotorData.class.getDeclaredMethod("load", CompoundTag.class);
-            load.setAccessible(true);
-            Function<CompoundTag, SoulMotorData> loader = tag -> {
-                try {
-                    return (SoulMotorData) load.invoke(null, tag);
-                } catch (ReflectiveOperationException e) {
-                    throw new IllegalStateException(e);
-                }
-            };
-            SoulMotorData fromDisk = new DimensionDataStorage(dataDir.toFile(), overworld.getServer().getFixerUpper())
-                    .get(loader, "croety_soul_motors");
+            SoulMotorData fromDisk = new DimensionDataStorage(dataDir.toFile(), overworld.getServer().getFixerUpper(), overworld.registryAccess())
+                    .get(SoulMotorData.FACTORY, "croety_soul_motors");
             helper.assertTrue(fromDisk != null && fromDisk.activeCount(owner) == 3 && !fromDisk.contains(oldest),
                     "SavedData 从磁盘重新读取后应保留跨维度上限和淘汰状态");
-            CompoundTag reloaded = fromDisk.save(new CompoundTag());
+            CompoundTag reloaded = fromDisk.save(new CompoundTag(), overworld.registryAccess());
             helper.assertTrue(reloaded.getList("Motors", 10).stream().anyMatch(row -> {
                 CompoundTag entry = (CompoundTag) row;
                 return entry.getLong("Id") == oldest && entry.getBoolean("Removed")
