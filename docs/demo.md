@@ -14,10 +14,11 @@
 
 ```powershell
 New-Item -ItemType Directory -Force build/javatmp | Out-Null
-$env:JAVA_TOOL_OPTIONS = '-Djdk.net.unixdomain.tmpdir=D:/Develop/croety/build/javatmp'
+$taskTemp = (Resolve-Path build/javatmp).Path.Replace('\', '/')
+$env:JAVA_TOOL_OPTIONS = "-Djdk.net.unixdomain.tmpdir=$taskTemp"
 ```
 
-创造模式的 **Croety 联动演示** 标签页包含马达、聚晶和液态灵魂桶。
+创造模式的 **Croety** 标签页包含马达、聚晶和液态灵魂桶。
 
 ## 新内容
 
@@ -29,7 +30,8 @@ $env:JAVA_TOOL_OPTIONS = '-Djdk.net.unixdomain.tmpdir=D:/Develop/croety/build/ja
 | `croety:fluid_soul_bucket` | 液态灵魂桶 |
 | `croety:soul_energy_orb` | 灵魂能量球 |
 
-聚晶已按用户修订使用 `waving_focus`，避免和 Goety 电涌聚晶混淆。初版聚晶使用临时海晶碎片外观。
+聚晶已按用户修订使用 `waving_focus`，避免和 Goety 电涌聚晶混淆，贴图使用用户最终定稿。
+按住 Shift 查看 Goety 聚晶详情时，显示“召唤一个临时的灵魂马达”。
 
 ## 马达与聚晶
 

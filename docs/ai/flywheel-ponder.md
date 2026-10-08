@@ -1054,7 +1054,7 @@ public final Quaternionf —— **你可以直接改它们，Flywheel 不知道*
 ```powershell
 $jargs = @('-cp', "$V\libs\*", '-d', "$V\out", '--release', '17',
            '-proc:none', '-nowarn', "$V\FlywheelSnippet.java")
-& "C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin\javac.exe" @jargs
+& "$env:JAVA_HOME\bin\javac.exe" @jargs
 ```
 
 ---
@@ -1953,12 +1953,12 @@ public interface LangRegistryAccess {
 ### 8.1 用到的 jar
 
 ```text
-FLYWHEEL_FULL = C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\dev\engine-room\flywheel\flywheel-forge-1.20.1\1.0.5-264_mapped_parchment_2023.09.03-1.20.1\flywheel-forge-1.20.1-1.0.5-264_mapped_parchment_2023.09.03-1.20.1.jar
-FLYWHEEL_API  = C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\dev\engine-room\flywheel\flywheel-forge-api-1.20.1\1.0.5-264_mapped_parchment_2023.09.03-1.20.1\flywheel-forge-api-1.20.1-1.0.5-264_mapped_parchment_2023.09.03-1.20.1.jar
-PONDER        = C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\net\createmod\ponder\Ponder-Forge-1.20.1\1.0.91_mapped_parchment_2023.09.03-1.20.1\Ponder-Forge-1.20.1-1.0.91_mapped_parchment_2023.09.03-1.20.1.jar
-CREATE        = C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\com\simibubi\create\create-1.20.1\6.0.8-291_mapped_parchment_2023.09.03-1.20.1\create-1.20.1-6.0.8-291_mapped_parchment_2023.09.03-1.20.1-slim.jar
-JAVAP         = C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin\javap.exe
-JAVAC         = C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin\javac.exe
+FLYWHEEL_FULL = $env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\dev\engine-room\flywheel\flywheel-forge-1.20.1\1.0.5-264_mapped_parchment_2023.09.03-1.20.1\flywheel-forge-1.20.1-1.0.5-264_mapped_parchment_2023.09.03-1.20.1.jar
+FLYWHEEL_API  = $env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\dev\engine-room\flywheel\flywheel-forge-api-1.20.1\1.0.5-264_mapped_parchment_2023.09.03-1.20.1\flywheel-forge-api-1.20.1-1.0.5-264_mapped_parchment_2023.09.03-1.20.1.jar
+PONDER        = $env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\net\createmod\ponder\Ponder-Forge-1.20.1\1.0.91_mapped_parchment_2023.09.03-1.20.1\Ponder-Forge-1.20.1-1.0.91_mapped_parchment_2023.09.03-1.20.1.jar
+CREATE        = $env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\com\simibubi\create\create-1.20.1\6.0.8-291_mapped_parchment_2023.09.03-1.20.1\create-1.20.1-6.0.8-291_mapped_parchment_2023.09.03-1.20.1-slim.jar
+JAVAP         = $env:JAVA_HOME\bin\javap.exe
+JAVAC         = $env:JAVA_HOME\bin\javac.exe
 ```
 
 ### 8.2 javap 命令
@@ -2236,7 +2236,7 @@ Get-ChildItem (Join-Path $fg 'deobf_dependencies')  -Recurse -Filter '*_mapped_*
 # 3. 编译（用通配符 classpath）
 $jargs = @('-cp', "$V\libs\*", '-d', "$V\out", '--release', '17',
            '-encoding', 'UTF-8', '-proc:none', '-nowarn', "$V\FlywheelSnippet.java")
-& "C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin\javac.exe" @jargs
+& "$env:JAVA_HOME\bin\javac.exe" @jargs
 ```
 
 > 踩坑记录（都是实际撞到的）：

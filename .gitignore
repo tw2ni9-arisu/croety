@@ -1,49 +1,40 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
+# 构建产物和 Gradle 缓存
+/.gradle/
+/build/
+/src/generated/.cache/
 
-# idea
-out
+# 开发运行目录、存档和本地发布资产
+/run/
+/run-data/
+/release-staging/
+/.local/
+/.mixin.out/
+
+# 可通过 tools/fetch-deps.ps1 重建的依赖与源码缓存
+/libs/maven/
+/libs/sources/
+
+# IDE 工作文件
+/.idea/
+/.settings/
+/.metadata/
+/.classpath
+/.project
+/bin/
+/out/
+/eclipse/
+*.iml
 *.ipr
 *.iws
-*.iml
-.idea
+*.launch
 
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
-
-# Files from Forge MDK
-forge*changelog.txt
-
-# Locally staged mod jars that have no public Maven (Goety).
-# Re-create them with: pwsh -File tools/fetch-deps.ps1
-libs/maven
-
-# Dependency source jars + ForgeFlower decompilation cache, used by
-# tools/find-api.ps1 -Source. Re-create with: pwsh -File tools/fetch-deps.ps1
-libs/sources
-
-# Image-generation drafts and temporary previews. Final project textures remain tracked.
-TEXTURES_MODELS/**/generated-*.png
-TEXTURES_MODELS/**/reference-preview.png
-TEXTURES_MODELS/**/v2/generated-v2.png
-TEXTURES_MODELS/**/v2/user-reference.png
-TEXTURES_MODELS/**/v2/waving_focus.png
-TEXTURES_MODELS/**/v2/preview.png
-
-# Local release staging and generated reports.
-release-staging
-*.sha256
-
-# Local agent planning/review notes and reference-only source assets.
-docs/superpowers
-TEXTURES_MODELS/needed
+# 本地凭据与操作系统生成文件
+.env
+.env.*
+!.env.example
+*.log
+hs_err_pid*
+replay_pid*
+*.heapdump
+.DS_Store
+Thumbs.db

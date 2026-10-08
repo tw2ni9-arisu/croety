@@ -1,161 +1,105 @@
-# Croety — Minecraft 1.20.1 Forge mod workspace
+# Croety
 
-A ready-to-use Forge 1.20.1 development environment (standard Forge MDK layout) that
-compiles against, and runs with, **Create 6.0.8** and **Goety 2.5.57.3** plus every
-prerequisite they need.
+Minecraft 1.20.1 / Forge 的 **Create × Goety 联动模组**。
 
-## Documentation map
+目前实现灵魂马达、涌动聚晶（`croety:waving_focus`）、液态灵魂与桶、灵魂能量球，以及加工、仪式和流体管网联动。
+完整玩法见 [使用说明](docs/demo.md)，验证记录见 [验证说明](docs/demo-verification.md)。
+原始需求保存在 [设计文档](docs/design.md)，标记 `#占位` 的内容不属于当前版本。
 
-| File | For whom | Content |
-|---|---|---|
-| `README.md` | humans | this file — setup, build, run, adding dependencies |
-| `AGENTS.md` | AI agents | project brief: environment, ground rules, pitfalls, verification checklist |
-| `docs/ai/forge-1.20.1.md` | AI agents | Forge/Minecraft 1.20.1 patterns (registration, blocks, items, block entities, menus, config, datagen) |
-| `docs/ai/create-6.0.8.md` | AI agents | Create 6.0.8 API reference (its official `api` packages, Registrate, kinetics, recipes, contraptions) |
-| `docs/ai/goety-2.5.57.3.md` | AI agents | Goety 2.5.57.3 API reference (its `api` packages, items, spells, servants) |
-| `docs/ai/flywheel-ponder.md` | AI agents | Flywheel client visuals and Ponder tutorial scenes |
-| `tools/find-api.ps1` | both | print the real signature **or the real Java source** of any class on the compile classpath |
-| `libs/sources/create-1.20.1-6.0.8-291/` | both | Create's complete Java source, extracted and greppable |
+## 玩家安装
 
-The `docs/ai/` references are generated from the actual jars with `javap`, so they describe the
-API this project really compiles against rather than a remembered one.
+在 Forge 1.20.1 环境中，把 Croety JAR 与下列依赖放进 `mods/`：
 
-## Verified versions
+| 组件 | 当前验证版本 |
+|---|---|
+| Minecraft | 1.20.1 |
+| Forge | 47.4.23 |
+| Create | 6.0.8（开发坐标 6.0.8-291） |
+| Goety | 2.5.57.3 |
+| Curios | 5.14.1+1.20.1 |
+| Patchouli（推荐，用于手册） | 1.20.1-85-FORGE |
 
-| Component | Version | Where it comes from |
-|---|---|---|
-| Minecraft | 1.20.1 | Forge userdev |
-| Forge | 1.20.1-47.4.23 | `maven.minecraftforge.net` |
-| ForgeGradle | 6.0.x | Gradle plugin portal |
-| Gradle | 8.8 | wrapper |
-| JDK | Temurin 17.0.20.1+1 | `%USERPROFILE%\.jdks\temurin-17` |
-| Mappings | Parchment 2023.09.03-1.20.1 (on top of Mojang official) | `maven.parchmentmc.org` |
-| Create | 6.0.8 (maven build 291, `:slim`) | `maven.createmod.net` |
-| Flywheel | 1.0.5-264 | `maven.createmod.net` |
-| Ponder | 1.0.91 (also bundles Catnip) | `maven.createmod.net` |
-| Registrate | MC1.20-1.3.3 | `maven.tterrag.com` |
-| MixinExtras | 0.4.1 | Maven Central |
-| Goety | 2.5.57.3 | staged in `libs/maven` (no public Maven) |
-| Curios API | 5.14.1+1.20.1 | `maven.theillusivec4.top` |
-| Patchouli | 1.20.1-85-FORGE | `maven.blamejared.com` |
-| JEI | 15.59.0.210 (optional) | `maven.blamejared.com` |
+Create 和 Goety 所需的前置组件也需按对应版本安装；JEI 为可选依赖。
+当前仓库只有本地构建和 `v1.0.0` tag，没有远程发布的 Release。
 
-The Flywheel / Ponder / Registrate / MixinExtras versions are exactly the ones Create
-6.0.8 bundles as jar-in-jar, so the dev classpath matches what players actually run.
+## 开发环境与首次构建
 
-## Java setup
+需要 **Java 17**、**PowerShell 7**。Gradle 8.8 由仓库中的 wrapper 提供。
 
-Forge 1.20.1 needs **Java 17**. Set `JAVA_HOME` to a Java 17 JDK before invoking Gradle.
-The repository deliberately leaves the path configurable so it works after cloning on another machine.
-
-For one PowerShell session:
+设置 `JAVA_HOME` 为自己的 Java 17 JDK：
 
 ```powershell
 $env:JAVA_HOME = 'C:\path\to\jdk-17'
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 ```
 
-## Build
+克隆到本机后，在仓库根目录执行：
 
 ```powershell
-.\gradlew.bat build
+./tools/fetch-deps.ps1
+./gradlew.bat build
 ```
 
-The jar lands in `build/libs/croety-1.0.0.jar`.
+Goety 没有本项目使用的公共 Maven 坐标；恢复脚本从固定的 Modrinth 地址取得版本2.5.57.3，
+校验 SHA1 后放入本地 Maven 仓库。脚本同时取得 Create、Ponder、Flywheel 源码，便于查 API。
+JAR 与源码缓存均不提交 Git。版本与依赖配置分别在 `gradle.properties` 和 `build.gradle`。
 
-## Run
+构建产物：`build/libs/croety-1.0.0.jar`。首次构建可能需要下载和处理依赖，耗时比增量构建长。
+
+## 运行与测试
 
 ```powershell
-.\gradlew.bat runClient     # client with Create + Goety loaded from the classpath
-.\gradlew.bat runServer     # dedicated server, prints "Done" when the world is up
-.\gradlew.bat runData       # datagen
+./gradlew.bat runClient          # 开发客户端
+./gradlew.bat runServer          # 开发专用服务端
+./gradlew.bat runGameTestServer  # 自动游戏测试，完成后退出
+./gradlew.bat runData            # 数据生成
 ```
 
-Mods declared as `implementation fg.deobf(...)` live on the run classpath directly, so
-there is nothing to copy into `run/mods`.
+开发依赖从 Gradle classpath 加载，不需要再复制到 `run/mods`。
+服务端首次运行时按提示编辑 `run/eula.txt` 接受 Minecraft EULA，再重启。
+测试和运行生成的配置、存档、日志留在本地，不提交仓库。
 
-## Layout
+GitHub 构建检查见 [.github/workflows/build.yml](.github/workflows/build.yml)：
+Windows runner 设置 Java 17，恢复依赖后执行构建并保存 JAR 作为运行产物。它不自动发布 Release。
+云端流程尚未执行，本地验证结果见验证说明。
 
-```
-build.gradle                              ForgeGradle setup, repositories and mod dependencies
-gradle.properties                         versions, mappings and the pinned JDK
-src/main/java/com/croety/
-    Croety.java                           @Mod entry point
-    Config.java                           example ForgeConfigSpec
-    integration/CreateIntegration.java    calls the Create 6.0.8 API
-    integration/GoetyIntegration.java     calls the Goety 2.5.57.3 API
-src/main/resources/META-INF/mods.toml     declares the create/goety/curios/patchouli deps
-libs/maven/                               local Maven repo holding Goety (no upstream Maven)
-tools/fetch-deps.ps1                      re-stages the locally hosted mod jars
-tools/find-api.ps1                        prints the real signature of any class on the classpath
-AGENTS.md                                 project brief auto-loaded by AI coding agents
-docs/ai/                                  per-dependency API references written for AI agents
-```
+## 仓库结构
 
-The two `integration` classes exist so a broken or missing dependency fails loudly at
-startup instead of silently at first use: `Croety#commonSetup` calls both and logs what
-it found.
-
-## Adding another mod
-
-Gradle-resolvable mods go in the `dependencies` block of `build.gradle`:
-
-```groovy
-implementation fg.deobf("<group>:<artifact>:<version>")
+```text
+.github/                 GitHub 构建检查
+src/main/java/           模组代码与 GameTest
+src/main/resources/      元数据、贴图、模型、语言、配方
+src/generated/           数据生成资源
+gradle/wrapper/          Gradle wrapper
+tools/                   依赖恢复、真实 API 查询
+docs/                    玩法、设计、验证与第三方声明
+docs/ai/                 本地依赖 API 参考
+AGENTS.md                AI 协作约定
+CONTRIBUTING.md           开发与提交说明
+CHANGELOG.md              项目更新记录
+LICENSE / NOTICE.md       MIT 许可证与第三方来源
 ```
 
-For mods that only exist as a jar (CurseForge/Modrinth releases), stage them under
-`libs/maven/<group path>/<artifact>/<version>/` next to a minimal `.pom` and add the
-coordinates the same way — `tools/fetch-deps.ps1` is a worked example.
+`build/`、`run/`、`.gradle/`、`libs/maven/`、`libs/sources/`、`release-staging/` 和 `.local/`
+均为本地工作目录，已在 [.gitignore](.gitignore) 排除。
+历史素材、内部计划及重复的内层仓库完整保存在 `.local/archive/2026-10-08/`。
 
-## Known gotchas
+## 常见构建问题
 
-**Create's mixin refmap must be remapped for the dev runtime.** Create ships its mixins
-with an SRG refmap, but a ForgeGradle dev run uses named mappings, so Mixin fails during
-startup with:
-
-```
-Mixin apply failed create.mixins.json:accessor.SystemReportAccessor -> net.minecraft.SystemReport
-InvalidAccessorException: No candidates were found matching f_143509_:Ljava/lang/String;
-```
-
-`build.gradle` therefore sets these two properties on every run configuration (the
-documented fix from the Create wiki):
-
-```groovy
-property 'mixin.env.remapRefMap', 'true'
-property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-```
-
-A healthy startup logs one `Remapping refMap <mod>.refmap.json` line per mod that ships
-mixins. If you add another mod with mixins and it crashes the same way, this is why.
-
-**The maven build number is part of the version.** Create is published per-CI-build, so
-`create_version` is `6.0.8-291`, not `6.0.8`. A new release jar corresponds to a
-specific build number on the Maven.
-
-## Network notes
-
-This machine's egress blocks CRL/OCSP endpoints, which makes `curl.exe` and default
-.NET requests fail with `CRYPT_E_REVOCATION_OFFLINE` / "The underlying connection was
-closed". `tools/fetch-deps.ps1` disables revocation checking before downloading; Gradle
-itself is unaffected because the JVM does not check revocation by default.
-
-## Demo scope and release
-
-The implemented demo covers the non-placeholder content from `croety.md`: the Soul Motor,
-Waving Focus, Liquid Soul, Liquid Soul Bucket, Soul Energy Orb, Create processing recipes,
-the Forge ritual, Goety soul storage, and the Create fluid network integration. The two
-blocks marked `#占位` and their dependent extraction gameplay remain outside this first demo.
-
-Detailed usage and verification records are in [docs/demo.md](docs/demo.md) and
-[docs/demo-verification.md](docs/demo-verification.md). The final Waving Focus texture is
-the approved 16×16 asset at `src/main/resources/assets/croety/textures/item/waving_focus.png`.
-
-To build the release jar:
+- Java版本不正确：检查 `JAVA_HOME`，不要依赖可能指向Java25的系统 `java` 命令。
+- 找不到Goety：先执行 `./tools/fetch-deps.ps1`。
+- Windows出现 `Unable to establish loopback connection`：可指定仓库内临时目录后重试：
 
 ```powershell
-.\gradlew.bat build
+New-Item -ItemType Directory -Force build/javatmp | Out-Null
+$taskTemp = (Resolve-Path build/javatmp).Path.Replace('\', '/')
+$env:JAVA_TOOL_OPTIONS = "-Djdk.net.unixdomain.tmpdir=$taskTemp"
+./gradlew.bat build
 ```
 
-The artifact is `build/libs/croety-1.0.0.jar`.
+Create开发运行必须保留 `build.gradle` 中的Mixin refmap重映射配置。
+API查询使用 `./tools/find-api.ps1 -Class 完整类名` 或 `-Source 完整类名`，以本地依赖为准。
+
+## 许可证
+
+Croety采用 [MIT许可证](LICENSE)。第三方依赖和衍生素材的归属与声明见 [NOTICE.md](NOTICE.md)。

@@ -30,9 +30,9 @@ cd D:\Develop\croety
 .\gradlew.bat runData      # 数据生成 -> src/generated/resources
 ```
 
-- **Forge 1.20.1 必须用 Java 17。** 机器上 `java` 命令是 Oracle Java 25（系统 PATH 优先级更高），
-  Gradle 8.8 跑不动它，所以 JDK 17 路径同时写死在 `gradle.properties` 的 `org.gradle.java.home`。
-  改 JDK 位置要同步改这两处。
+- **Forge 1.20.1 必须用 Java 17。** 本机 `java` 命令可能指向 Oracle Java 25（系统 PATH 优先级更高），
+  Gradle wrapper 应通过 `JAVA_HOME` 使用 JDK 17。仓库不写死 `org.gradle.java.home` 或用户目录；
+  换机后先设置 `JAVA_HOME`，`tools/find-api.ps1` 也从该路径寻找工具。
 - 首次构建/首次 runClient 会下载大量东西（Gradle 发行版、Minecraft 反编译、资源文件），
   之后就是几十秒。别以为卡死了。
 - Gradle 构建约 20 秒（增量）/ 6 分钟（首次反编译）。
@@ -41,11 +41,10 @@ cd D:\Develop\croety
 
 ```
 build.gradle                              依赖、仓库、runs（含 mixin refmap 关键配置）
-gradle.properties                         版本号、映射、JDK 路径 —— 改版本只改这里
+gradle.properties                         版本号、映射、构建参数 —— 改版本只改这里
 settings.gradle                           pluginManagement 仓库（Parchment 插件必须在这声明）
 src/main/java/com/croety/
-    Croety.java                           @Mod 入口：注册、事件、配置
-    Config.java                           ForgeConfigSpec 范例
+    Croety.java                           @Mod 入口：实际内容注册与联动初始化
     integration/CreateIntegration.java    调用 Create API（也是编译期探针）
     integration/GoetyIntegration.java     调用 Goety API
 src/main/resources/META-INF/mods.toml     mod 元数据 + 依赖声明（create/goety/curios/patchouli）
@@ -104,8 +103,9 @@ Flywheel/Ponder/Registrate/MixinExtras 的版本**刻意等于 Create 6.0.8 自�
 
 ### 6.1 通用 Forge 骨架
 
-完整的可编译范例在 `src/main/java/com/croety/`（`Croety.java` 注册方块/物品/标签页+配置，
-`Config.java` 配置，两个 `integration` 类跨 mod 调用）。最常用的三段：
+实际注册代码在 `src/main/java/com/croety/content/motor/MotorContent.java`（方块、物品、方块实体）和
+`content/DemoTab.java`（创造模式标签页），由 `Croety.java` 接入。MDK 的 example 内容和示例 `Config.java` 已移除。
+两个 `integration` 类提供跨 mod 调用。最常用的三段：
 
 ```java
 // 注册（DeferredRegister 实测签名）

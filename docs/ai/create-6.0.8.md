@@ -2819,11 +2819,11 @@ public class MySawMovement implements MovementBehaviour {
 变量：
 
 ```powershell
-$javap  = "C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin\javap.exe"
-$create = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\com\simibubi\create\create-1.20.1\6.0.8-291_mapped_parchment_2023.09.03-1.20.1\create-1.20.1-6.0.8-291_mapped_parchment_2023.09.03-1.20.1-slim.jar"
-$reg    = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\com\tterrag\registrate\Registrate\MC1.20-1.3.3_mapped_parchment_2023.09.03-1.20.1\Registrate-MC1.20-1.3.3_mapped_parchment_2023.09.03-1.20.1.jar"
-$mc     = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1\forge-1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1.jar"
-$bus    = "C:\Users\TW2NTY_NIN9\.gradle\caches\modules-2\files-2.1\net.minecraftforge\eventbus\6.2.33\3fae69cfa9c5095bcc25c0a8a3ed9b26c156f922\eventbus-6.2.33.jar"
+$javap  = "$env:JAVA_HOME\bin\javap.exe"
+$create = "$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\com\simibubi\create\create-1.20.1\6.0.8-291_mapped_parchment_2023.09.03-1.20.1\create-1.20.1-6.0.8-291_mapped_parchment_2023.09.03-1.20.1-slim.jar"
+$reg    = "$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\com\tterrag\registrate\Registrate\MC1.20-1.3.3_mapped_parchment_2023.09.03-1.20.1\Registrate-MC1.20-1.3.3_mapped_parchment_2023.09.03-1.20.1.jar"
+$mc     = "$env:USERPROFILE\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1\forge-1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1.jar"
+$bus    = "$env:USERPROFILE\.gradle\caches\modules-2\files-2.1\net.minecraftforge\eventbus\6.2.33\3fae69cfa9c5095bcc25c0a8a3ed9b26c156f922\eventbus-6.2.33.jar"
 ```
 
 ### 10.1 总览 / 常量类
@@ -3085,7 +3085,7 @@ $zip.Dispose()
 & $javap -cp $create com.simibubi.create.api.equipment.goggles.IHaveCustomOverlayIcon
 & $javap -cp $create com.simibubi.create.api.equipment.goggles.IProxyHoveringInformation
 # LangBuilder（在 Ponder jar 里，内含 Catnip）
-$ponder = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\net\createmod\ponder\Ponder-Forge-1.20.1\1.0.91_mapped_parchment_2023.09.03-1.20.1\Ponder-Forge-1.20.1-1.0.91_mapped_parchment_2023.09.03-1.20.1.jar"
+$ponder = "$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\net\createmod\ponder\Ponder-Forge-1.20.1\1.0.91_mapped_parchment_2023.09.03-1.20.1\Ponder-Forge-1.20.1-1.0.91_mapped_parchment_2023.09.03-1.20.1.jar"
 & $javap -cp $ponder net.createmod.catnip.lang.LangBuilder
 
 # recipe

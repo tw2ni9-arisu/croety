@@ -50,7 +50,7 @@
 
 马达召唤数据通过 `notifyUpdate()` 同步，客户端按游戏时间计算显示；召唤/消散使用原版粒子包。
 工作盆粒子使用客户端专用Mixin，不在服务端加载或扫描世界。
-新粒子视觉和护目镜倒计时的客户端观感，留给用户对新构建做一次简短复测；不将基础版反馈冒充为新增效果的实测结果。
+用户已在后续实机验收中确认：粒子效果正常、马达寿命显示无误、灵魂球合并无误。涌动聚晶最终贴图也由用户定稿并接入。
 新增功能独立审查所报的两个能量边界已修复，并通过限定范围复审；没有剩余代码阻塞项。
 
 ## 修复的实质性问题
@@ -63,6 +63,22 @@
 
 ## 构建环境备注
 
+后续内容清理：移除MDK的 `example_item`、`example_block`、`example_tab` 注册、资源和示例配置；创造栏名称统一为“Croety”；补充 Goety 原生 Shift 详情键 `item.croety.waving_focus.info`。
+`build/content-cleanup-red.log` 已重现示例内容仍注册的问题，修正后 `build/content-cleanup-verified.log` 记录42项 GameTest全部通过与构建成功。已核验最终JAR无示例资源/旧配置类，且打包后的中英文语言文件包含正确页签名称和详情文本。
+`build/content-cleanup-server.log` 记录普通服务端启动成功：`Done (2.739s)!`，随后通过 `stop` 正常保存退出。旧测试存档报告的缺失映射仅为本次明确移除的 `croety:example_block` 和 `croety:example_item`。
+
 JDK本地通信管道使用工作区 `build/javatmp`，避免系统短路径临时目录触发Windows AF_UNIX错误。
 外网预检不稳定时使用已缓存依赖离线运行；`-Dnet.minecraftforge.gradle.check.certs=false` 仅跳过离线构建无须执行的远程预检，不更改依赖下载的TLS配置。
-现有MDK示例方块/物品仍有原本缺失贴图提示，不属于本次新增内容；新增马达、聚晶和液态灵魂资源已接入。
+首次验收时存在的MDK示例方块/物品及其缺失贴图已在后续清理中移除；同时移除了示例标签页、配置和日志脚手架。
+
+## 仓库整理验证（2026-10-08）
+
+- 正式源码、资源、Gradle wrapper、依赖恢复脚本、玩法与API资料保留在仓库中；原始需求移到 `docs/design.md`。
+- 素材草稿、内部计划、重复MDK说明和独立内层仓库完整保存在忽略的 `.local/archive/2026-10-08/`；内层仓库仍为原提交 `bdbd277`，工作树干净。
+- 用户选择采用内层已有MIT许可证；根目录 `LICENSE` 与原文件一致，JAR的模组元数据声明MIT。MDK原始许可证和致谢原文保留于 `docs/third-party/forge-mdk/`。
+- `build/repository-layout-build.log`：主工作区 `build` 成功。
+- 从Git暂存区导出独立工作副本，不复制旧项目的build、运行目录和依赖目录。`build/repository-dependency-restore.log` 记录重新下载Goety并通过固定SHA1校验；`build/repository-clean-copy-build.log` 记录独立副本全部构建任务执行成功。该验证共用机器的Gradle用户缓存，并不证明首次下载所有Maven依赖的网络可用性。
+- GitHub Actions的YAML已解析，构建步骤在本地核对；云端流程未执行。流水线只构建并保存运行产物，不包含Release发布动作。
+- 已检查Git索引不包含 `.local`、build、run、依赖JAR、历史素材或嵌套仓库；Gradle wrapper具有执行权限，行尾规则区分文本、批处理和二进制资源。
+
+此轮只整理文件、许可证、文档与构建辅助脚本，未变更玩法。42项游戏测试的既有验证记录见上文。

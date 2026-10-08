@@ -1,10 +1,11 @@
 {
   "block.croety.soul_motor": "Soul Motor",
   "item.croety.waving_focus": "Waving Focus",
+  "item.croety.waving_focus.info": "Summon a temporary Soul Motor.",
   "item.croety.fluid_soul_bucket": "Liquid Soul Bucket",
   "fluid.croety.fluid_soul": "Liquid Soul",
   "entity.croety.soul_energy_orb": "Soul Energy Orb",
-  "itemGroup.croety.demo": "Croety Demo",
+  "itemGroup.croety.demo": "Croety",
   "spell.croety.waving": "Waving",
   "croety.goggles.lifetime.permanent": "Lifetime: Permanent",
   "croety.goggles.lifetime.remaining": "Remaining lifetime: %s:%s"

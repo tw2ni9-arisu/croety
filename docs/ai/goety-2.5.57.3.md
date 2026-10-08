@@ -5,11 +5,11 @@
 > 不是从记忆或网上教程抄的。写 Goety 集成代码前读完本文，就**不需要再去翻 jar**。
 >
 > - Goety jar（deobf + Parchment）：
->   `C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\com\polarice3\goety\2.5.57.3_mapped_parchment_2023.09.03-1.20.1\goety-2.5.57.3_mapped_parchment_2023.09.03-1.20.1.jar`
+>   `$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\com\polarice3\goety\2.5.57.3_mapped_parchment_2023.09.03-1.20.1\goety-2.5.57.3_mapped_parchment_2023.09.03-1.20.1.jar`
 > - Forge / Minecraft jar：
->   `C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1\forge-1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1.jar`
+>   `$env:USERPROFILE\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1\forge-1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1.jar`
 > - Curios jar：
->   `C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\top\theillusivec4\curios\curios-forge\5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1\curios-forge-5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1.jar`
+>   `$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\top\theillusivec4\curios\curios-forge\5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1\curios-forge-5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1.jar`
 >
 > **两种查证手段**（都在本工作区里，复现命令见 [第 10 节](#10-验证记录)）：
 >
@@ -3030,10 +3030,10 @@ if (b instanceof SoulCandlestickBlock candlestick) { /* ... */ }
 ### 10.1 环境变量
 
 ```powershell
-$jd   = "C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin\javap.exe"
-$jar  = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\com\polarice3\goety\2.5.57.3_mapped_parchment_2023.09.03-1.20.1\goety-2.5.57.3_mapped_parchment_2023.09.03-1.20.1.jar"
-$mjar = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1\forge-1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1.jar"
-$cjar = "C:\Users\TW2NTY_NIN9\.gradle\caches\forge_gradle\deobf_dependencies\top\theillusivec4\curios\curios-forge\5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1\curios-forge-5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1.jar"
+$jd   = "$env:JAVA_HOME\bin\javap.exe"
+$jar  = "$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\com\polarice3\goety\2.5.57.3_mapped_parchment_2023.09.03-1.20.1\goety-2.5.57.3_mapped_parchment_2023.09.03-1.20.1.jar"
+$mjar = "$env:USERPROFILE\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1\forge-1.20.1-47.4.23_mapped_parchment_2023.09.03-1.20.1.jar"
+$cjar = "$env:USERPROFILE\.gradle\caches\forge_gradle\deobf_dependencies\top\theillusivec4\curios\curios-forge\5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1\curios-forge-5.14.1+1.20.1_mapped_parchment_2023.09.03-1.20.1.jar"
 ```
 
 ### 10.2 主类与注册表入口

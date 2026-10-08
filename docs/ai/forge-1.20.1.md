@@ -368,7 +368,7 @@ public Builder push(String path);
 public Builder pop();
 ```
 
-`src/main/java/com/croety/Config.java` 是可直接照抄的完整范例：定义 → `BUILDER.build()` 得到 SPEC →
+原MDK示例 `Config.java` 已从工程移除。需要新增业务配置时按以下流程接入：定义 → `BUILDER.build()` 得到 SPEC →
 在 `@Mod` 构造函数里 `context.registerConfig(ModConfig.Type.COMMON, Config.SPEC)` →
 监听 `ModConfigEvent` 把值读进 `static` 字段。
 

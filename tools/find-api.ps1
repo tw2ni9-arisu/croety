@@ -65,11 +65,12 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $root     = Split-Path -Parent $PSScriptRoot
-$jdkBin   = 'C:\Users\TW2NTY_NIN9\.jdks\temurin-17\jdk-17.0.20.1+1\bin'
-$javap    = Join-Path $jdkBin 'javap.exe'
-$java     = Join-Path $jdkBin 'java.exe'
-if (-not (Test-Path $javap)) { $javap = (Get-Command javap.exe -ErrorAction SilentlyContinue).Source }
-if (-not $javap) { throw "javap not found. Set \$jdkBin in this script." }
+$jdkBin   = if ($env:JAVA_HOME) { Join-Path $env:JAVA_HOME 'bin' } else { $null }
+$javap    = if ($jdkBin) { Join-Path $jdkBin 'javap.exe' } else { $null }
+$java     = if ($jdkBin) { Join-Path $jdkBin 'java.exe' } else { $null }
+if (-not $javap -or -not (Test-Path -LiteralPath $javap)) { $javap = (Get-Command javap.exe -ErrorAction SilentlyContinue).Source }
+if (-not $java -or -not (Test-Path -LiteralPath $java)) { $java = (Get-Command java.exe -ErrorAction SilentlyContinue).Source }
+if (-not $javap -or -not $java) { throw '未找到 JDK 工具，请设置 JAVA_HOME 为 Java 17 JDK。' }
 
 $srcDir   = Join-Path $root 'libs\sources'
 $decompDir = Join-Path $srcDir '.decompiled'

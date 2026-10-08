@@ -1,9 +1,0 @@
-axis_top.png: 16x16 RGBA; visible=16; alpha=89..89; max opacity=34.9%; source mask preserved; blue palette PASS
-axis.png: 16x16 RGBA; visible=64; alpha=89..89; max opacity=34.9%; source mask preserved; blue palette PASS
-creative_casing.png: 16x16 RGBA; visible=256; alpha=89..89; max opacity=34.9%; source mask preserved; blue palette PASS
-creative_motor.png: 16x16 RGBA; visible=238; alpha=89..89; max opacity=34.9%; source mask preserved; blue palette PASS
-flap_display_front.png: 16x16 RGBA; visible=256; alpha=89..89; max opacity=34.9%; source mask preserved; blue palette PASS
-block.json: original geometry/UV/display preserved; all textures resolved; translucent PASS
-block_vertical.json: original geometry/UV/display preserved; all textures resolved; translucent PASS
-item.json: original geometry/UV/display preserved; all textures resolved; translucent PASS
-All 6 blockstate variants and item parent resolved PASS
