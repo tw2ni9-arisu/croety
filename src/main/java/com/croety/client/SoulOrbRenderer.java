@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -45,7 +44,6 @@ public class SoulOrbRenderer extends EntityRenderer<SoulOrb> {
       int $$18 = (int) Mth.lerp(blend, 0xB9, 0xEB);
       pPoseStack.translate(0.0F, 0.1F, 0.0F);
       pPoseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-      pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
       pPoseStack.scale(0.3F, 0.3F, 0.3F);
       VertexConsumer $$20 = pBuffer.getBuffer(RENDER_TYPE);
       PoseStack.Pose $$21 = pPoseStack.last();

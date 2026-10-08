@@ -73,6 +73,8 @@ NeoForge 1.21.1 使用 Java 21。不要把机器专属 JDK 路径写进仓库配
 8. Goety `ITotem.tag(stack)` 是 CUSTOM_DATA 的副本，写入用 `updateTag` 或精确方法 `setSoulsamount`（a 小写）。ITotem 不再继承 ISoulContainer。图腾转成耗尽物品时要保留其它数据组件，不能只复制旧 NBT。
 9. Goety `Spell.acceptedEnchantments()` 返回 `List<ResourceKey<Enchantment>>`；`ArcaBlockEntity.getPlayer()` 从 OwnedBlockEntity 继承。接收能力的真实类型来自 `ModBlockEntities.ARCA/CURSED_CAGE`。
 10. 数据包目录为 `recipe`、`tags/item`、`structure`；资源包 format 为 34。ItemStack 配方输出按新 codec 使用 `id`，流体 JSON 按 Create 6.0.10 serializer 核对。
+11. 复用模型时仍须迁移加载元数据：元素 `forge_data` → `neoforge_data`，桶 parent/loader 使用 `neoforge:item/bucket` / `neoforge:fluid_container`。PNG、几何、UV与变换保留。实际客户端已证明旧字段会让模型解析失败，不能只用服务端或JSON语法检查替代模型加载验证。
+12. SoulOrb沿用本版本ExperienceOrbRenderer的顶点与Cull类型，cameraOrientation后不附加旧版180°Y旋转，否则正面会翻到背面被剔除；颜色与11档UV仍保留。
 
 Create 仍是旋转机械/应力系统，使用 RPM、SU、应力容量、动力源等术语。Addon 应力用 `BlockStressValues.CAPACITIES/IMPACTS`，不能用仅支持 Create 自有方块的 CStress。马达初始化仍要通知动力网络；保留 128 RPM × 64 SU/RPM。
 
