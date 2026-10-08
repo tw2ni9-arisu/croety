@@ -3,8 +3,6 @@ package com.croety.content.orb;
 import com.croety.content.PlayerSouls;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -21,7 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
 /** 运动沿用经验球算法；相邻同符号灵魂合并为一颗按总价值显示、拾取的球。 */
 public class SoulOrb extends Entity {
@@ -40,7 +37,7 @@ public class SoulOrb extends Entity {
         setDeltaMovement((random.nextDouble() * .2 - .1) * 2, random.nextDouble() * .4, (random.nextDouble() * .2 - .1) * 2);
     }
 
-    @Override protected void defineSynchedData() { entityData.define(VALUE, 1L); }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) { builder.define(VALUE, 1L); }
     public long getValue() { return entityData.get(VALUE); }
     public int getAge() { return age; }
     public int getIcon() {
@@ -93,7 +90,7 @@ public class SoulOrb extends Entity {
         if (onGround()) setDeltaMovement(getDeltaMovement().multiply(1, -.9, 1));
         if (!level().isClientSide) {
             if (!isOnFire() && level().isDay() && !isInWaterRainOrBubble() && level().canSeeSky(blockPosition())
-                    && getLightLevelDependentMagicValue() > .5F) setSecondsOnFire(8);
+                    && getLightLevelDependentMagicValue() > .5F) igniteForSeconds(8.0F);
             if (++age >= 6000) discard();
         }
     }
@@ -153,5 +150,4 @@ public class SoulOrb extends Entity {
     @Override public boolean isAttackable() { return false; }
     @Override protected MovementEmission getMovementEmission() { return MovementEmission.NONE; }
     @Override protected void doWaterSplashEffect() {}
-    @Override public Packet<ClientGamePacketListener> getAddEntityPacket() { return NetworkHooks.getEntitySpawningPacket(this); }
 }

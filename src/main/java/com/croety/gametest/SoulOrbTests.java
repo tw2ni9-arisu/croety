@@ -7,9 +7,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.util.FakePlayerFactory;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 @GameTestHolder("croety")
 @PrefixGameTestTemplate(false)
@@ -17,15 +18,16 @@ public class SoulOrbTests {
     // 防止未注册、负值丢失、拾取错误增加经验以及寿命未恢复。
     @GameTest(template = "empty")
     public static void negativeOrbConsumesSouls(GameTestHelper helper) {
-        var type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation("croety", "soul_energy_orb"));
-        helper.assertTrue(ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation("croety", "soul_energy_orb")), "灵魂球必须注册");
+        var id = ResourceLocation.fromNamespaceAndPath("croety", "soul_energy_orb");
+        helper.assertTrue(BuiltInRegistries.ENTITY_TYPE.containsKey(id), "灵魂球必须注册");
+        var type = BuiltInRegistries.ENTITY_TYPE.get(id);
         Entity orb = type.create(helper.getLevel());
         CompoundTag tag = new CompoundTag();
         tag.putInt("Value", -7);
         tag.putInt("Health", 5);
         tag.putInt("Count", 1);
         orb.load(tag);
-        Player player = net.minecraftforge.common.util.FakePlayerFactory.getMinecraft(helper.getLevel());
+        Player player = FakePlayerFactory.getMinecraft(helper.getLevel());
         SEHelper.setSEActive(player, true);
         SEHelper.setSESouls(player, 30);
         orb.playerTouch(player);
@@ -37,8 +39,9 @@ public class SoulOrbTests {
 
     @GameTest(template = "empty")
     public static void loadedAgeExpires(GameTestHelper helper) {
-        var type = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation("croety", "soul_energy_orb"));
-        helper.assertTrue(ForgeRegistries.ENTITY_TYPES.containsKey(new ResourceLocation("croety", "soul_energy_orb")), "灵魂球必须注册");
+        var id = ResourceLocation.fromNamespaceAndPath("croety", "soul_energy_orb");
+        helper.assertTrue(BuiltInRegistries.ENTITY_TYPE.containsKey(id), "灵魂球必须注册");
+        var type = BuiltInRegistries.ENTITY_TYPE.get(id);
         Entity orb = type.create(helper.getLevel());
         CompoundTag tag = new CompoundTag();
         tag.putInt("Age", 5999);
@@ -51,4 +54,3 @@ public class SoulOrbTests {
         helper.succeed();
     }
 }
-
