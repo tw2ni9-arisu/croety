@@ -14,6 +14,10 @@
 /libs/maven/
 /libs/sources/
 
+# 按 reference/SOURCES.md 恢复的上游参考仓库，不嵌入本项目 Git 历史。
+/reference/*
+!/reference/SOURCES.md
+
 # IDE 工作文件
 /.idea/
 /.settings/
