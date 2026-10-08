@@ -1,6 +1,6 @@
 # Croety：NeoForge 1.21.1 API 与迁移指南
 
-本指南面向 `D:\Develop\croety-1.21.1-neoforge`。它汇总 NeoForge 1.21.1 官方文档、官方 MDK 和本仓库实际代码/对应依赖源码中的接口；它不是“移植已完成”的证明。当前目标源码仍含 Forge 1.20.1 的包名和方法，写代码时须逐步按这里的版本边界迁移。
+本指南面向 `D:\Develop\croety-1.21.1-neoforge`。它汇总 NeoForge 1.21.1 官方文档、官方 MDK 和本仓库实际代码/对应依赖源码中的接口；完成状态需结合具体构建、运行和用户验收证据。
 
 ## 目标版本、来源和核验边界
 
@@ -21,7 +21,7 @@ Goety 3.2.0 制品中的 `loaderVersion="${loader_version_range}"`、NeoForge `v
 1. NeoForge 自身接口：看[1.21.1 官方文档](https://docs.neoforged.net/docs/1.21.1/)和[官方 1.21.1 MDK（ModDevGradle）](https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle)。
 2. Create API：查 `reference/create/` 的 6.0.10 源码，而不是旧 `docs/ai/create-6.0.8.md`。
 3. Goety API：先看 [`docs/ai/goety-3.2.0.md`](goety-3.2.0.md)，再查精确制品 `reference/artifacts/goety-3.2.0.jar` 与用户授权源码 `reference/goety/src/main/java/`；若只有签名，先写明业务行为待核验。
-4. `tools/find-api.ps1` 仍只扫描旧 `libs/sources` / ForgeGradle 缓存，不覆盖 NeoForge 1.21.1 依赖；使用前先确认它实际查询的 jar。不要把旧分支的工具输出当作本分支证据。
+4. 先运行 `gradlew writeApiClasspath`，再使用 `tools/find-api.ps1 -Class/-Source/-Search/-ListJars`。脚本只查真实编译清单和同版本 source；缺失的产物明确报错，不再扫描旧 Forge 缓存或反编译 Goety。
 
 ## MDK、Gradle、runs 与 Mixin
 
@@ -58,7 +58,7 @@ public final class Croety {
 
 注册表与启动生命周期事件挂到每个 mod 的 mod bus；游戏运行时事件挂到 NeoForge game bus。将事件注册到哪条总线要按官方事件页核对，不能把两种 bus 混用。
 
-客户端注册保持客户端隔离，例如使用 `net.neoforged.fml.common.EventBusSubscriber`（`@EventBusSubscriber(modid = ..., bus = Bus.MOD, value = Dist.CLIENT)`），或通过客户端专用代码把 listener 加到 mod bus。事件总线与 `@SubscribeEvent` 的接口在 `net.neoforged.bus.api`；生命周期事件在 `net.neoforged.fml.event.lifecycle`。实体和方块实体 renderer 在 mod bus 的 `EntityRenderersEvent.RegisterRenderers` 注册；客户端专用类不得被专用服务端加载。客户端 setup 内需要触及需主线程的游戏注册时使用事件提供的 `enqueueWork`。Create 6.0.10 的 Flywheel visual 注册仍由 Create 自己延迟到客户端 setup；直接调用 `SimpleBlockEntityVisualizer` 时，按 `reference/create/src/main/java/com/simibubi/create/foundation/data/CreateBlockEntityBuilder.java` 与当前项目实际渲染类型检查调用方式。
+客户端注册保持客户端隔离，例如使用 `net.neoforged.fml.common.EventBusSubscriber`（`@EventBusSubscriber(modid = ..., value = Dist.CLIENT)`），或通过客户端专用代码把 listener 加到 mod bus。本工作区 FML 4.0.42 的 AutomaticEventSubscriber 已按监听方法参数是否实现 IModBusEvent 自动分配总线，bus 属性已标记 forRemoval，不再显式指定。事件总线与 `@SubscribeEvent` 的接口在 `net.neoforged.bus.api`；生命周期事件在 `net.neoforged.fml.event.lifecycle`。实体和方块实体 renderer 在 mod bus 的 `EntityRenderersEvent.RegisterRenderers` 注册；客户端专用类不得被专用服务端加载。客户端 setup 内需要触及需主线程的游戏注册时使用事件提供的 `enqueueWork`。Create 6.0.10 的 Flywheel visual 注册仍由 Create 自己延迟到客户端 setup；直接调用 `SimpleBlockEntityVisualizer` 时，按 `reference/create/src/main/java/com/simibubi/create/foundation/data/CreateBlockEntityBuilder.java` 与当前项目实际渲染类型检查调用方式。
 
 ## 注册、Holder 与 ResourceLocation
 
@@ -132,6 +132,8 @@ public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
 ```
 
 改变保存数据后仍须 `setDirty()`。跨维度、全存档共用的 Soul Motor index 当前挂在 Overworld，适合这一存储位置。
+
+**真实运行发现的异步边界：** NeoForge 21.1.234 的 SavedData.save(File, Provider) 把 NBT 副本交给 IOUtilities.withIOWorker，方法返回时写盘可能尚未完成。测试调用 DimensionDataStorage.save() 后要用 `IOUtilities.waitUntilIOWorkerComplete()` 再从磁盘创建新读取器，否则会读到缺文件或旧内容。此方法和异步实现已由映射源码/JAR 核对，首轮磁盘重载 GameTest 重现了原同步假设的失败。生产逻辑继续使用平台原生异步保存。
 
 ### 方块实体
 

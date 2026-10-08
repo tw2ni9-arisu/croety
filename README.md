@@ -1,63 +1,71 @@
-# Croety-1.0.0
+# Croety
 
-The mod code was generated using AI; humans were actually only responsible for art and planning. This 1.20.1 version can also only run normally with the following dependencies.
+Croety 是 Minecraft 1.21.1 / NeoForge 的 Create × Goety 联动模组，modid 为 `croety`。
 
-A **Create × Goety integration mod** for Minecraft 1.20.1 / Forge.
+## 当前内容
 
-## Current Content
-1. Entity Soul Energy Orbs and Liquid Soul energy
-2. Some simple recipes for liquid soul energy
-3. Surging Focus and Soul Motor
-4. ......
+- `croety:soul_energy_orb`：液态灵魂从动力管道开口排出时生成；拾取后补充 Goety 灵魂。
+- `croety:fluid_soul` 与 `croety:fluid_soul_bucket`：液态灵魂流体、桶、Create 加工配方，以及对 Goety 图腾和灵魂方舟的流体交互。
+- `croety:waving_focus`：涌动聚晶；施法召唤 `croety:soul_motor`。
+- `croety:soul_motor`：提供 128 RPM、64 SU/RPM 的动力，法术召唤的马达有 10 分钟寿命。
 
-## Future (Possible) Content
-1. Soul Extraction Pool croety: soul_drain
-2. Mechanical Cursed Infuser croety: mechanical_cursed_infuser
+涌动聚晶的稳定注册 ID 是 `croety:waving_focus`。萃魂池 `croety:soul_drain` 和动力诅咒注入器 `croety:mechanical_cursed_infuser` 尚未实现。
 
-## Dependencies
+## 版本与依赖
 
-| Mods      | Currently Verified Version |
-|-----------|---|
-| Minecraft | 1.20.1 |
-| Forge     | 47.4.23 |
-| Create    | 6.0.8 |
-| Goety     | 2.5.57.3 |
-| Curios    | 5.14.1+1.20.1 |
-| Patchouli | 1.20.1-85-FORGE |
+| 组件 | 版本 |
+|---|---|
+| Minecraft | 1.21.1 |
+| NeoForge | 21.1.234 |
+| Java | 21 |
+| Create | 6.0.10（开发制品 `6.0.10-281`） |
+| Goety | 3.2.0 |
+| Curios | 9.5.1+1.21.1 |
+| Patchouli | 1.21.1-93-NEOFORGE |
 
-## License
+开发运行还固定使用 Flywheel 1.0.6、Ponder 1.0.82+mc1.21.1、Vanillin 1.1.3-41 和 Registrate MC1.21-1.3.0+67。依赖来源及坐标见 [`reference/SOURCES.md`](reference/SOURCES.md)。
 
-MIT
+## 构建与运行
 
+此机准备的 JDK 21 位于 `.local/jdk21/jdk-21.0.12.1+1`；`.local` 被 Git 忽略，fresh checkout 不会包含它。换机器时，把下面的 `$jdkHome` 改为该机器上任意已安装的 JDK 21 根目录。在项目目录的 PowerShell 中设置当前终端环境即可，不会修改系统环境变量：
 
+```powershell
+$jdkHome = (Resolve-Path '.local/jdk21/jdk-21.0.12.1+1').Path
+$env:JAVA_HOME = $jdkHome
+$env:PATH = "$jdkHome\bin;$env:PATH"
+java -version
+javac -version
+```
 
-# 机械动力: 黑魔法-1.0.0
+此机还需把 Java 临时目录指向工作区，避免 Java 21 默认临时路径导致 Gradle 启动失败。下面设置只作用于当前 PowerShell 进程；每个新终端都要重新执行：
 
-模组代码使用AI生成，人工实际仅负责美术与策划，该1.20.1版本也仅能做到在以下依赖上正常运行
+```powershell
+New-Item -ItemType Directory -Force build/javatmp | Out-Null
+$taskTemp = (Resolve-Path build/javatmp).Path.Replace('\', '/')
+$env:JAVA_TOOL_OPTIONS = "-Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 -Djdk.net.unixdomain.tmpdir=$taskTemp"
+```
 
-Minecraft 1.20.1 / Forge 的 **Create × Goety 联动模组**
+`libs/maven` 同样由 Git 忽略。fresh checkout 后，首次构建前先运行一次脚本，以恢复并校验 Goety 本地 Maven 制品：
 
-## 当前已有内容
-1. 实体灵魂能量球与液态灵魂
-2. 灵魂能量的部分简易配方
-3. 涌动聚晶及灵魂马达
-4. ......
+```powershell
+.\tools\fetch-deps.ps1
+```
 
-## 未来(可能)内容
-1. 萃魂池croety: soul_drain
-2. 动力诅咒注入器croety: mechanical_cursed_infuser
+确认 `java -version` 和 `javac -version` 显示 Java 21、临时目录变量已设置，并完成首次依赖恢复后运行：
 
-## 依赖
+```powershell
+.\gradlew.bat build
+.\gradlew.bat runGameTestServer
+.\gradlew.bat runClient
+.\gradlew.bat runServer
+```
 
-| Mods      | 当前验证版本 |
-|-----------|---|
-| Minecraft | 1.20.1 |
-| Forge     | 47.4.23 |
-| 机械动力      | 6.0.8（开发坐标 6.0.8-291） |
-| 诡厄巫法      | 2.5.57.3 |
-| Curios    | 5.14.1+1.20.1 |
-| 帕秋莉手册     | 1.20.1-85-FORGE |
+构建产物为 `build/libs/croety-1.0.0.jar`。首次运行专用服务器时，按服务器提示接受 EULA。详细玩法和本次迁移验证状态见 [`docs/demo.md`](docs/demo.md)。
 
-## 证书
+1.21.1 数据资源使用单数目录：配方在 `src/main/resources/data/croety/recipe/`，物品标签在 `src/main/resources/data/croety/tags/item/`，结构模板在 `src/main/resources/data/croety/structure/`。
+
+`docs/ai/forge-1.20.1.md`、`docs/ai/create-6.0.8.md`、`docs/ai/goety-2.5.57.3.md` 和 `docs/ai/flywheel-ponder.md` 仅作旧版本背景参考；当前依赖和开发运行方式以本仓库的 1.21.1 配置及 [`docs/ai/neoforge-1.21.1.md`](docs/ai/neoforge-1.21.1.md) 为准。
+
+## 许可
 
 MIT

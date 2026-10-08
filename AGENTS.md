@@ -12,7 +12,7 @@
 
 - Croety 是 Create × Goety 联动 mod，modid `croety`，主包 `com.croety`。
 - 目标环境：Minecraft 1.21.1、NeoForge 21.1.234、Java 21；Create 6.0.10-281、Goety 3.2.0（用户原写作 3.2.00）。
-- `D:\Develop\croety-1.21.1-neoforge` 是迁移工作区。当前 `src/main` 和 Gradle 文件仍能看到 Forge 1.20.1 API；不要把“目标版本”误报成“移植完成”。
+- `D:\Develop\croety-1.21.1-neoforge` 是迁移工作区。源码和构建已适配新平台；构建、游戏测试、专用服务端与用户客户端验收分别需要记录，不能把编译通过当作全部完成。
 - 依赖来源、commit/hash 与下载坐标见 [`reference/SOURCES.md`](reference/SOURCES.md)，现有功能和准备证据见 [`docs/migration-preparation.md`](docs/migration-preparation.md)。
 - 本次分工：主 agent 负责规划、核心接口/代码和调试；基础查找、仓库拉取与基础代码由 GPT-6-luna（max）处理；审查使用 GPT-6-sol（high）。
 - 不扩充初版占位需求；现有功能、数值、注册 ID 和 42 项 GameTest 都要迁移。模型和贴图直接复用。
@@ -39,7 +39,7 @@ NeoForge 1.21.1 使用 Java 21。不要把机器专属 JDK 路径写进仓库配
 - Curios 1.21.1 官方源码 checkout：`reference/curios/`。
 - Patchouli 官方源码 checkout：`reference/patchouli/`，标签 `release-1.21.1-93`。
 - Goety 3.2.0 精确发行制品：`reference/artifacts/goety-3.2.0.jar`；授权维护仓库为 [Vivideru/Goety-3](https://github.com/Vivideru/Goety-3)，源码在 `reference/goety/src/main/java/`，锁定提交 `2f42435123d2e781107f41a14dadd0d59cbd64ea`。深入接口见 [`docs/ai/goety-3.2.0.md`](docs/ai/goety-3.2.0.md)。用户明确要求不再反编译。
-- `tools/find-api.ps1` 仍是 Forge 工作区脚本：它搜索 `libs/sources` 和 ForgeGradle 缓存，不覆盖此分支的 NeoForge/reference 依赖。不要据此声称新版本签名已核实。
+- `gradlew writeApiClasspath` 生成真实 `build/api-classpath.txt`（含 NeoForge/Minecraft 生成产物）。`tools/find-api.ps1` 查询此清单；`-Source` 优先读锁定的 reference 源码，再读同版本 sources JAR，不反编译 Goety。清单缺文件时重跑上述任务，不能查旧 Forge 缓存补空白。
 - `docs/ai/forge-1.20.1.md`、`docs/ai/create-6.0.8.md`、`docs/ai/goety-2.5.57.3.md` 和 `docs/ai/flywheel-ponder.md` 只可作旧版本背景资料；接口签名不能直接照搬。
 
 ## 固定依赖
@@ -66,7 +66,7 @@ NeoForge 1.21.1 使用 Java 21。不要把机器专属 JDK 路径写进仓库配
 1. 入口注入 `net.neoforged.bus.api.IEventBus` / `net.neoforged.fml.ModContainer`。注册和生命周期使用 mod bus，游戏 tick 使用 `NeoForge.EVENT_BUS`；服务端末尾 tick 类型为 `ServerTickEvent.Post`。
 2. 用 `net.neoforged.neoforge.registries.DeferredRegister` / `DeferredHolder`，vanilla registry key 来自 `Registries`，流体类型 key 是 `NeoForgeRegistries.Keys.FLUID_TYPES`。`DeferredRegister.createBlocks/createItems` 分别返回特化注册器，条目为 `DeferredBlock/DeferredItem`。
 3. ResourceLocation 不再直接 new：`fromNamespaceAndPath(namespace, path)`、`parse(id)`、`withDefaultNamespace(path)`。
-4. Create 的持久化钩子为 `read/write(CompoundTag, HolderLookup.Provider, boolean)`。SavedData 使用 `SavedData.Factory`，`load/save` 同样带 registry provider；保留 `setDirty()` 与主世界跨维度索引。
+4. Create 的持久化钩子为 `read/write(CompoundTag, HolderLookup.Provider, boolean)`。SavedData 使用 `SavedData.Factory`，`load/save` 同样带 registry provider；保留 `setDirty()` 与主世界跨维度索引。NeoForge 的 SavedData 保存为异步写盘，测试重载前需 `IOUtilities.waitUntilIOWorkerComplete()`；不要把测试同步要求写进生产保存逻辑。
 5. SoulOrb 直接继承 Entity，`defineSynchedData(SynchedEntityData.Builder)` 内调用 `builder.define`，不调用抽象的父类方法。生成包签名带 `ServerEntity`，自定义 VALUE 继续由实体同步数据同步。
 6. 流体用 `BaseFlowingFluid`。方块和物品能力在 `RegisterCapabilitiesEvent` 注册；方块查询用 `level.getCapability(Capabilities.FluidHandler.BLOCK, pos, side)`，无能力是 null。不使用旧 LazyOptional/AttachCapabilitiesEvent。
 7. `BucketItem` 子类不继承 NeoForge 为精确桶类提供的默认能力，必须给 `SoulBucketItem` 注册 `Capabilities.FluidHandler.ITEM` / `FluidBucketWrapper`。客户端流体扩展用 `RegisterClientExtensionsEvent` 并保持客户端隔离。
