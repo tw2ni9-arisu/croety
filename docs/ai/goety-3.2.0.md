@@ -6,7 +6,7 @@
 
 发行 JAR 在 `reference/artifacts/goety-3.2.0.jar`；SHA-1 为 `82a92e697bfb7d8c1fa359c1e6d01a900b33c9e4`，已与 Modrinth 发行元数据核对。当前源码依据是用户提供的 [Vivideru/Goety-3](https://github.com/Vivideru/Goety-3)，位于 `reference/goety/`。Goety-2 的 `1.20` 分支为历史版本，不能当作本版本源码。签名记录在 `reference/goety-3.2.0-api.txt`。源码 commit、发行 URL 和依赖锁定见 `reference/SOURCES.md`。
 
-本文件的签名已用 Java 21 `javap` 核对。后续实现核对直接阅读授权维护仓库源码，不再进行反编译。当前尚未证明 Croety 新版可以编译或运行。
+本文件的签名已用 Java 21 `javap` 核对，实现依据授权维护仓库源码，不再进行反编译。迁移代码已通过构建、44项GameTest和专用服务端启动，客户端用户验收另行记录，见 `docs/neoforge-verification.md`。
 
 ## 1. 图腾与 ItemStack 数据
 

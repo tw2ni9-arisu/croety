@@ -32,7 +32,8 @@
 - GPT-6-sol（high）Task1：构建、注册基础、资源codec和工具通过；3项Minor已由原Luna实现者修正并限定复核关闭。
 - GPT-6-sol（high）Task2/3：核心马达/法术/存档及流体/组件接口Spec与Quality通过，没有阻塞项。
 - GPT-6-sol（high）Task4：实体、renderer、客户端注册、VALUE首发同步和现有Mixin接口通过，没有阻塞项。
-- 整分支终审与客户端用户验收仍待完成，不能以服务端GameTest替代客户端画面、轴动画、流体纹理/粒子验收。
+- GPT-6-sol（high）整分支终审：未发现Critical/Important问题，可进入客户端用户验收；三处准备阶段的旧文档状态已同步修正。
+- 不能以服务端GameTest替代客户端画面、轴动画、流体纹理/粒子验收；这一阶段仍待用户确认。
 
 ## 待用户实机验收
 

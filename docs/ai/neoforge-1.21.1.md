@@ -38,7 +38,7 @@ config="croety.mixins.json"
 
 官方 MDK 模板保留了 `[[mixins]]` 示例；Create 1.21.1 官方源码也在其 `neoforge.mods.toml` 中声明 Mixin config。依赖版 Create 的三个现有 Mixin 注入点仍要按 `reference/create/` 当前源码逐项比对，再在 `runClient` 中验证。不能把 Forge 的 `mixin.env.remapRefMap` / `createSrgToMcp/output.srg` 配置当成 NeoForge 必需项。
 
-运行验证目标为 `build`、`runClient`、`runServer`、`runGameTestServer` 和 `runData`；本次准备文档没有运行这些任务，不能据此宣称构建或游戏启动成功。
+运行验证目标为 `build`、`runClient`、`runServer`、`runGameTestServer` 和 `runData`。构建、44项GameTest和专用服务端已实际通过；项目没有自定义DataGenerator，不用空的runData成功替代行为测试。客户端和用户反馈状态见 `docs/neoforge-verification.md`。
 
 ## Mod 入口、事件总线和客户端事件
 
@@ -219,7 +219,7 @@ MC 1.21 将多种 datapack 目录改成单数。仓库现有文件迁移时至�
 - Create 6.0.10 还在通过 `CreateBlockEntityBuilder.visual(...).apply()` 于 client setup 注册 visual；也可看 Create 的 `AllBlockEntityTypes` 使用到的 `SimpleBlockEntityVisualizer` / `OrientedRotatingVisual` 实际组合。
 - Create 源码仓库的 `gradle.properties` 指明该版本配套 Flywheel 1.0.6、Ponder 1.0.82、Registrate `MC1.21-1.3.0+67`；依赖坐标仍以 Create 的发布配置和 Goety 实际依赖共同核实。
 
-这里已按 `reference/create/` 的实际 6.0.10 源码校对 API 名；没有在 Croety 上编译或启动验证这些接入代码。
+这里按 `reference/create/` 的实际6.0.10源码和目标JAR核对接口；Croety已实际编译，并在44项GameTest中验证了动力网络、流体与配方接入，客户端画面需实机验收。
 
 ### Goety
 
