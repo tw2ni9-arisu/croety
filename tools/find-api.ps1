@@ -33,9 +33,14 @@ if (-not (Test-Path -LiteralPath $classpathFile)) {
     throw "没有 build/api-classpath.txt。先运行 .\gradlew.bat writeApiClasspath。"
 }
 
-$classpathEntries = Get-Content -LiteralPath $classpathFile |
+$classpathEntries = @(Get-Content -LiteralPath $classpathFile |
     ForEach-Object { $_.Trim() } |
-    Where-Object { $_ -and (Test-Path -LiteralPath $_) }
+    Where-Object { $_ })
+$missingEntries = @($classpathEntries | Where-Object { -not (Test-Path -LiteralPath $_) })
+if ($missingEntries.Count -gt 0) {
+    $missingList = $missingEntries -join [Environment]::NewLine
+    throw "编译 classpath 文件包含不存在的路径:`n$missingList`n请重新运行 .\gradlew.bat writeApiClasspath 后再查询。"
+}
 
 $jars = @($classpathEntries | Where-Object { [IO.Path]::GetExtension($_) -ieq '.jar' })
 if ($Jar) {

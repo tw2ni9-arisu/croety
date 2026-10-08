@@ -29,12 +29,15 @@ function Get-Sha256([string] $Path) {
 }
 
 $sourceJar = $null
+if ((Test-Path -LiteralPath $targetJar) -and (Get-Sha256 $targetJar) -eq $expectedSha256) {
+    $sourceJar = $targetJar
+}
+
 if (Test-Path -LiteralPath $referenceJar) {
-    $referenceHash = Get-Sha256 $referenceJar
-    if ($referenceHash -eq $expectedSha256) {
+    if (-not $sourceJar -and (Get-Sha256 $referenceJar) -eq $expectedSha256) {
         $sourceJar = $referenceJar
         Write-Host "Using verified release artifact: $referenceJar"
-    } else {
+    } elseif (-not $sourceJar) {
         Write-Warning "Reference artifact hash mismatch; downloading the pinned official release."
     }
 }
