@@ -16,10 +16,10 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 @GameTestHolder("croety")
 @PrefixGameTestTemplate(false)
@@ -77,7 +77,7 @@ public class SoulMixingTests {
         });
         h.succeedWhen(() -> h.assertTrue(outputItems(basin, ModItems.CURSED_METAL_INGOT.get()) == 4 && basin.inputTank.isEmpty()
                 && basin.getInputInventory().isEmpty(), "加热搅拌应消耗25mB与金铁，产出4诅咒金属：input="
-                + basin.getInputInventory().serializeNBT() + ", output=" + basin.getOutputInventory().serializeNBT()
+                + basin.getInputInventory().serializeNBT(h.getLevel().registryAccess()) + ", output=" + basin.getOutputInventory().serializeNBT(h.getLevel().registryAccess())
                 + ", fluid=" + basin.inputTank.getPrimaryHandler().getFluid() + ", mixer="
                 + ((com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity) h.getBlockEntity(new BlockPos(2, 3, 2))).getSpeed()));
     }

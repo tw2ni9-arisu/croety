@@ -33,14 +33,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.UUID;
 
 @GameTestHolder("croety")
@@ -114,7 +114,7 @@ public class SoulIntegrationTests {
     @GameTest(template = "empty")
     public static void rootsPartialThenConsumedAndSoulTotemSpent(GameTestHelper h) {
         ItemStack roots = new ItemStack(ModItems.TOTEM_OF_ROOTS.get());
-        ITotem.setMaxSoulAmount(roots, 100); ITotem.setSoulsAmount(roots, 100);
+        ITotem.setMaxSoulAmount(roots, 100); ITotem.setSoulsamount(roots, 100);
         FluidTank tank = new FluidTank(1500);
         tank.fill(new FluidStack(SoulFluidContent.SOUL.get(), 1460), FluidAction.EXECUTE);
         var simulated = SoulTransfers.emptyTotem(roots, tank, true);
@@ -125,7 +125,7 @@ public class SoulIntegrationTests {
         var consumed = SoulTransfers.emptyTotem(partial.getSecond(), tank, false);
         h.assertTrue(consumed.getSecond().isEmpty() && consumed.getFirst().getAmount() == 60, "根图腾耗尽应消失");
         ItemStack soul = new ItemStack(ModItems.TOTEM_OF_SOULS.get());
-        ITotem.setMaxSoulAmount(soul, 10000); ITotem.setSoulsAmount(soul, 200);
+        ITotem.setMaxSoulAmount(soul, 10000); ITotem.setSoulsamount(soul, 200);
         FluidTank empty = new FluidTank(1500);
         var spent = SoulTransfers.emptyTotem(soul, empty, false);
         h.assertTrue(spent.getSecond().is(ModItems.SPENT_TOTEM.get()) && empty.getFluidAmount() == 200, "灵魂图腾耗尽应变为耗尽图腾");
@@ -135,7 +135,7 @@ public class SoulIntegrationTests {
     @GameTest(template = "empty")
     public static void otherFluidAndFullTankDoNotConsumeTotem(GameTestHelper h) {
         ItemStack roots = new ItemStack(ModItems.TOTEM_OF_ROOTS.get());
-        ITotem.setSoulsAmount(roots, 100);
+        ITotem.setSoulsamount(roots, 100);
         FluidTank tank = new FluidTank(1500);
         tank.fill(new FluidStack(Fluids.WATER, 100), FluidAction.EXECUTE);
         h.assertTrue(SoulTransfers.emptyTotem(roots, tank, false).getFirst().isEmpty(), "异种流体不能混入");
@@ -159,7 +159,8 @@ public class SoulIntegrationTests {
             SEHelper.setSESouls(player, MainConfig.MaxArcaSouls.get() - 35);
             var capability = SEHelper.getCapability(player);
             capability.setArcaBlock(h.absolutePos(pos)); capability.setArcaBlockDimension(h.getLevel().dimension());
-            var receiver = arca.getCapability(ForgeCapabilities.FLUID_HANDLER).orElseThrow(IllegalStateException::new);
+            var receiver = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, arca.getBlockPos(), null);
+            h.assertTrue(receiver != null, "灵魂方舟必须注册流体接收能力");
             var offered = new FluidStack(SoulFluidContent.SOUL.get(), 100);
             h.assertTrue(receiver.fill(offered, FluidAction.SIMULATE) == 35, "方舟模拟只接受剩余35");
             h.assertTrue(SEHelper.getSESouls(player) == MainConfig.MaxArcaSouls.get() - 35, "模拟不充值");
@@ -175,8 +176,8 @@ public class SoulIntegrationTests {
     public static void openPipeSimulationAndDischargeConserveSouls(GameTestHelper h) {
         BlockPos pos = h.absolutePos(new BlockPos(2, 2, 2));
         OpenEndedPipe pipe = new OpenEndedPipe(new BlockFace(pos, Direction.EAST));
-        pipe.manageSource(h.getLevel());
-        var handler = pipe.provideHandler().orElseThrow(IllegalStateException::new);
+        pipe.manageSource(h.getLevel(), null);
+        var handler = pipe.provideHandler().getCapability();
         FluidStack offered = new FluidStack(SoulFluidContent.SOUL.get(), 100);
         int total = 0;
         AABB area = new AABB(pos).inflate(4);
@@ -200,7 +201,8 @@ public class SoulIntegrationTests {
         h.setBlock(new BlockPos(2, 2, 2), AllBlocks.MECHANICAL_PUMP.get().defaultBlockState().setValue(PumpBlock.FACING, Direction.EAST));
         h.setBlock(new BlockPos(3, 2, 2), AllBlocks.FLUID_PIPE.get().defaultBlockState()
                 .setValue(FluidPipeBlock.WEST, true).setValue(FluidPipeBlock.EAST, true));
-        var tank = h.getBlockEntity(new BlockPos(1, 2, 2)).getCapability(ForgeCapabilities.FLUID_HANDLER).orElseThrow(IllegalStateException::new);
+        var tank = h.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, h.absolutePos(new BlockPos(1, 2, 2)), null);
+        h.assertTrue(tank != null, "Create储罐必须提供流体能力");
         tank.fill(new FluidStack(SoulFluidContent.SOUL.get(), 1000), FluidAction.EXECUTE);
         h.runAtTickTime(20, () -> {
             h.assertTrue(tank.getFluidInTank(0).getAmount() == 1000, "停泵时不能扣液");

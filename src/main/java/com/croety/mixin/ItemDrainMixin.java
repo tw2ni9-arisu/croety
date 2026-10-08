@@ -24,8 +24,8 @@ public class ItemDrainMixin {
         if (heldItem.stack.is(com.croety.content.fluid.SoulFluidContent.BUCKET.get())
                 && processingTicks == 5 && !drain.getLevel().isClientSide) {
             internalTank.allowInsertion();
-            int accepted = internalTank.getPrimaryHandler().fill(new net.minecraftforge.fluids.FluidStack(
-                    com.croety.content.fluid.SoulFluidContent.SOUL.get(), 1000), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
+            int accepted = internalTank.getPrimaryHandler().fill(new net.neoforged.neoforge.fluids.FluidStack(
+                    com.croety.content.fluid.SoulFluidContent.SOUL.get(), 1000), net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
             internalTank.forbidInsertion();
             if (accepted != 1000) {
                 processingTicks = ItemDrainBlockEntity.FILLING_TIME;

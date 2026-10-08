@@ -24,12 +24,12 @@ public final class PlayerSouls {
         ItemStack totem = TotemFinder.FindTotem(player);
         if (!(totem.getItem() instanceof ITotem type)) return 0;
         int before = ITotem.currentSouls(totem);
-        int maximum = totem.hasTag() && totem.getTag().contains(ITotem.MAX_SOUL_AMOUNT)
+        int maximum = ITotem.tag(totem).contains(ITotem.MAX_SOUL_AMOUNT)
                 ? ITotem.maximumSouls(totem) : type.getMaxSouls();
         int after = before + accepted(before, maximum, delta);
         if (!simulate && after != before) {
             ITotem.setMaxSoulAmount(totem, maximum);
-            ITotem.setSoulsAmount(totem, after);
+            ITotem.setSoulsamount(totem, after);
             player.getInventory().setChanged();
         }
         return after - before;

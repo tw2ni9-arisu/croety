@@ -12,10 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class SoulBucketItem extends BucketItem {
-    public SoulBucketItem(Properties properties) { super(SoulFluidContent.SOUL, properties); }
-    @Override public net.minecraftforge.common.capabilities.ICapabilityProvider initCapabilities(ItemStack stack, net.minecraft.nbt.CompoundTag tag) {
-        return new net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper(stack);
-    }
+    public SoulBucketItem(Properties properties) { super(SoulFluidContent.SOUL.get(), properties); }
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!player.isShiftKeyDown()) return InteractionResultHolder.pass(stack);
