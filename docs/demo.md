@@ -87,7 +87,7 @@ Create 的 `create:windmill_sails` 是方块标签，包含 16 色风帆、框�
 
 ## 验证状态
 
-本次迁移记录 [`build/migration-verified.log`](../build/migration-verified.log) 显示 `BUILD SUCCESSFUL`，44 项 GameTest 全部通过。专用服务端已启动至 `Done`，并通过控制台stop正常保存退出。客户端仍待用户在本机实机验收；完整状态见 [NeoForge验证记录](neoforge-verification.md)。
+最终干净构建记录 [`build/final-clean-verified.log`](../build/final-clean-verified.log) 显示 `BUILD SUCCESSFUL`，44 项 GameTest 全部通过。专用服务端已正常启动并保存退出；客户端功能及三项视觉修复均由用户实机确认通过。完整证据和最终产物hash见 [NeoForge验证记录](neoforge-verification.md)。
 
 ## 本版范围
 

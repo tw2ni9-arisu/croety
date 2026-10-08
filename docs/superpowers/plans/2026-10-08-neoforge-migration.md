@@ -1,6 +1,6 @@
 # Croety 1.21.1 NeoForge Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. 用户已指定混合执行：主 agent 编写核心接口和逻辑，GPT-6-luna（max）编写基础部分，GPT-6-sol（high）审查；此分工优先于技能的默认模型路由。
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking. 用户已指定混合执行：主 agent 编写核心接口和逻辑，GPT-6-luna（max）编写基础部分，GPT-6-sol（high）审查；此分工优先于技能的默认模型路由。
 
 **Goal:** 完整迁移现有 Croety 到 Minecraft 1.21.1 NeoForge / Java 21，产出通过自动与用户实机验收的 JAR。
 
@@ -49,13 +49,13 @@
 - Produces: Java 21 `build`、`runClient`、`runServer`、`runGameTestServer`；`Croety(IEventBus, ModContainer)`；现有内容静态注册方法继续接收 NeoForge `IEventBus`，注册字段仍可 `.get()`。
 - Produces: `writeApiClasspath` Gradle task，将实际 `sourceSets.main.compileClasspath` 写到 `build/api-classpath.txt` 并强制解析，用于 `tools/find-api.ps1`，避免递归猜缓存 JAR。
 
-- [ ] 先换用官方 ModDevGradle 结构和 Java 21，Gradle 采用 Create 源码的 8.14.3，固定全部版本；Goety 获取脚本下载精确官方发行 URL 并校验 hash，在本地 Maven 中提供可重建制品，不依赖 `reference` 中的临时 JAR 运行。
-- [ ] 在业务源码尚未改动时运行新环境 `compileJava`，记录旧 Forge/1.20.1 API 的失败，作为平台迁移前证据；依赖下载错误单独处理，不能当作代码不兼容证明。
-- [ ] 移植本任务拥有的入口、注册和客户端隔离基础；Mixin compatibility 改为 JAVA_21，在 NeoForge 元数据声明配置，去掉旧 Forge SRG refmap 设置。
-- [ ] 迁移数据目录及目标 codec：ItemStack 输出使用 `id`；Create 流体 ingredient/output 格式直接按 6.0.10 serializers 与其生成配方核对。数量、加热和仪式成本不变。
-- [ ] 执行 `gradlew tasks --all` 与 `gradlew writeApiClasspath`，确认四个要求的 run tasks 存在、所有 classpath 制品成功解析且版本正确；从本地 Maven 核验 Goety hash。
-- [ ] 对比基线资产哈希，PNG/模型/方块状态无内容变化。更新 CI 到 Java 21 与新分支构建，保留仅构建/保存产物的行为。
-- [ ] 主 agent 检查 diff，GPT-6-sol（high）审查构建/接入；修复后提交本任务文件。此时剩余业务类仍未迁移，不宣称整体 build 通过。
+- [x] 先换用官方 ModDevGradle 结构和 Java 21，Gradle 采用 Create 源码的 8.14.3，固定全部版本；Goety 获取脚本下载精确官方发行 URL 并校验 hash，在本地 Maven 中提供可重建制品，不依赖 `reference` 中的临时 JAR 运行。
+- [x] 在业务源码尚未改动时运行新环境 `compileJava`，记录旧 Forge/1.20.1 API 的失败，作为平台迁移前证据；依赖下载错误单独处理，不能当作代码不兼容证明。
+- [x] 移植本任务拥有的入口、注册和客户端隔离基础；Mixin compatibility 改为 JAVA_21，在 NeoForge 元数据声明配置，去掉旧 Forge SRG refmap 设置。
+- [x] 迁移数据目录及目标 codec：ItemStack 输出使用 `id`；Create 流体 ingredient/output 格式直接按 6.0.10 serializers 与其生成配方核对。数量、加热和仪式成本不变。
+- [x] 执行 `gradlew tasks --all` 与 `gradlew writeApiClasspath`，确认四个要求的 run tasks 存在、所有 classpath 制品成功解析且版本正确；从本地 Maven 核验 Goety hash。
+- [x] 对比基线资产哈希，PNG/模型/方块状态无内容变化。更新 CI 到 Java 21 与新分支构建，保留仅构建/保存产物的行为。
+- [x] 主 agent 检查 diff，GPT-6-sol（high）审查构建/接入；修复后提交本任务文件。此时剩余业务类仍未迁移，不宣称整体 build 通过。
 
 ### Task 2: 马达、召唤存档与 Goety 法术
 
@@ -71,12 +71,12 @@
 - Preserves: `SoulMotorData.get(MinecraftServer)`、`add(UUID, ServerLevel, BlockPos)`、`contains(long)`、`forget(long)`、`tick(MinecraftServer)`、`LIFETIME=12000`，以及已有召唤/护目镜 public 接口。
 - Produces: `WavingSpell.acceptedEnchantments(): List<ResourceKey<Enchantment>>`；真实 NeoForge 放置事件和 snapshot 回滚。
 
-- [ ] 先适配本任务 GameTest 的平台调用，保留六方向 128 RPM/64 SU、实际轴 8192 SU、第四台/跨维度淘汰、永久马达、过期初始化、扳手无掉落、法杖冷却及仪式断言。
-- [ ] 将 `MotorPersistenceTests` 的保存/加载和磁盘 `DimensionDataStorage` 重建改为当前真实 API，assert 保留所属 UUID、recordId、expiresAt、未加载下界 removed 标记和 activeCount=3。
-- [ ] 在尚未改本任务实现时运行适用的编译/测试，确认失败源于旧 API 或原行为未实现，保存日志。
-- [ ] 最小适配注册、`ServerTickEvent.Post`、Create 持久化 provider、SavedData 工厂及 ResourceLocation 工厂；核心生命周期和应力逻辑沿用。
-- [ ] 查授权 Goety 源适配法术签名和原生法杖/仪式测试调用；保持 1024 消耗、瞬发、1200 刻冷却和 32 格放置权限检查。
-- [ ] Task 3/4 完成使整工程可运行后，执行本任务对应测试；全部通过且磁盘证据存在，再经 GPT-6-sol（high）审查并提交。
+- [x] 先适配本任务 GameTest 的平台调用，保留六方向 128 RPM/64 SU、实际轴 8192 SU、第四台/跨维度淘汰、永久马达、过期初始化、扳手无掉落、法杖冷却及仪式断言。
+- [x] 将 `MotorPersistenceTests` 的保存/加载和磁盘 `DimensionDataStorage` 重建改为当前真实 API，assert 保留所属 UUID、recordId、expiresAt、未加载下界 removed 标记和 activeCount=3。
+- [x] 在尚未改本任务实现时运行适用的编译/测试，确认失败源于旧 API 或原行为未实现，保存日志。
+- [x] 最小适配注册、`ServerTickEvent.Post`、Create 持久化 provider、SavedData 工厂及 ResourceLocation 工厂；核心生命周期和应力逻辑沿用。
+- [x] 查授权 Goety 源适配法术签名和原生法杖/仪式测试调用；保持 1024 消耗、瞬发、1200 刻冷却和 32 格放置权限检查。
+- [x] Task 3/4 完成使整工程可运行后，执行本任务对应测试；全部通过且磁盘证据存在，再经 GPT-6-sol（high）审查并提交。
 
 ### Task 3: 流体能力、物品组件与能量守恒
 
@@ -93,13 +93,13 @@
 - Produces: `SoulReceiver.registerCapabilities(RegisterCapabilitiesEvent)` 按真实 Goety BE types 提供 `IFluidHandler`，并为 `SoulBucketItem` 注册 `Capabilities.FluidHandler.ITEM`；流体采用 `BaseFlowingFluid`。
 - Preserves: `SoulFluidContent.TYPE/SOUL/FLOWING/BUCKET` 字段 `.get()`；无 LiquidBlock 与等价 OpenPipeEffectHandler。
 
-- [ ] 先移植原能力查询、图腾数据和 mixing GameTest，保留模拟零副作用、实际剩余容量、满池/异流体保护、桶 1000 往返、停泵与排放守恒断言。
-- [ ] 新增 `spentTotemPreservesCustomComponents`：200 灵魂图腾携带 CUSTOM_DATA marker=`preserve` 与 CUSTOM_NAME=`Migration marker`；排入足容量池后，产 200 mB、变 SPENT_TOTEM、两个标记保留，只有 Souls/Max Souls 移除；原输入模拟时保持全部组件不变。
-- [ ] 新增 `totemWithoutStoredMaximumUsesItemCapacity`：未写 Max Souls 的有效图腾可按 `getMaxSouls()` 接受注液，SIMULATE 不创建/修改组件，EXECUTE 仅增加接受量；沿用现有配置调低/负余额边界测试。
-- [ ] 用 compile/GameTest 先验证新平台能力缺失或新边界失败，再适配上述本任务实现。图腾读用 `ITotem.tag`，写用 `setSoulsamount/updateTag`，耗尽转换复制实际 component patch 并去掉灵魂字段。
-- [ ] 按 NeoForge 事件注册能力，移除本次使其无用的 LazyOptional/旧 provider imports。受液行为仍以目标是否在线绑定、剩余容量和模拟/执行状态判断；不复刻 Goety attachment 系统。
-- [ ] 保留分液池提交当刻二次检查、图腾部分转移和无世界流体。通过真实 pipeline、bucket、cage/arca 与四条 mixing 测试验证。
-- [ ] GPT-6-sol（high）审查能量账、组件和 Mixin 注入目标；修复、重跑受影响测试后提交本任务文件。
+- [x] 先移植原能力查询、图腾数据和 mixing GameTest，保留模拟零副作用、实际剩余容量、满池/异流体保护、桶 1000 往返、停泵与排放守恒断言。
+- [x] 新增 `spentTotemPreservesCustomComponents`：200 灵魂图腾携带 CUSTOM_DATA marker=`preserve` 与 CUSTOM_NAME=`Migration marker`；排入足容量池后，产 200 mB、变 SPENT_TOTEM、两个标记保留，只有 Souls/Max Souls 移除；原输入模拟时保持全部组件不变。
+- [x] 新增 `totemWithoutStoredMaximumUsesItemCapacity`：未写 Max Souls 的有效图腾可按 `getMaxSouls()` 接受注液，SIMULATE 不创建/修改组件，EXECUTE 仅增加接受量；沿用现有配置调低/负余额边界测试。
+- [x] 用 compile/GameTest 先验证新平台能力缺失或新边界失败，再适配上述本任务实现。图腾读用 `ITotem.tag`，写用 `setSoulsamount/updateTag`，耗尽转换复制实际 component patch 并去掉灵魂字段。
+- [x] 按 NeoForge 事件注册能力，移除本次使其无用的 LazyOptional/旧 provider imports。受液行为仍以目标是否在线绑定、剩余容量和模拟/执行状态判断；不复刻 Goety attachment 系统。
+- [x] 保留分液池提交当刻二次检查、图腾部分转移和无世界流体。通过真实 pipeline、bucket、cage/arca 与四条 mixing 测试验证。
+- [x] GPT-6-sol（high）审查能量账、组件和 Mixin 注入目标；修复、重跑受影响测试后提交本任务文件。
 
 ### Task 4: 实体、客户端渲染和其余回归测试
 
@@ -114,11 +114,11 @@
 - Produces: `SoulOrb.defineSynchedData(SynchedEntityData.Builder)`；通过 vanilla/NeoForge `getAddEntityPacket(ServerEntity)` 跟踪生成；RegisterClientExtensionsEvent 的 fluid texture 扩展；原 BER/Flywheel visual 和蓝绿 orb renderer。
 - Preserves: `SoulOrb.award(ServerLevel, Vec3, int)`、`getValue()`、`getAge()`、`getIcon()`、运动/合并/拾取/伤害/6000 刻逻辑及旧 Value×Count 读取。
 
-- [ ] 先适配原 orb/polish/cleanup 测试平台接口，保留负值余量、配置调低、同号合并、相反符号、6000刻、水浮、阳光、环境伤害、11档、保存价值和护目镜取整断言。
-- [ ] 记录尚未迁移实现的编译或运行失败，再最小适配 Entity builder/spawn packet 与 renderer 顶点链；SoulOrb 直接继承 Entity，不调用抽象 `super.defineSynchedData`。
-- [ ] NeoForge 客户端专用事件隔离 renderer/visual/fluid extensions；服务端不加载客户端类。新流体纹理继续引用已有 `block/fluid_soul_still`。
-- [ ] 保持三个 Mixin 的目标方法与客户端专用 Basin 配置；按真实 Create 源修正参数或渲染调用，不增加服务端世界扫描。
-- [ ] 整工程 `compileJava` 和原 42+新增边界 GameTest 全部通过后，GPT-6-sol（high）审查本任务；修复并提交。
+- [x] 先适配原 orb/polish/cleanup 测试平台接口，保留负值余量、配置调低、同号合并、相反符号、6000刻、水浮、阳光、环境伤害、11档、保存价值和护目镜取整断言。
+- [x] 记录尚未迁移实现的编译或运行失败，再最小适配 Entity builder/spawn packet 与 renderer 顶点链；SoulOrb 直接继承 Entity，不调用抽象 `super.defineSynchedData`。
+- [x] NeoForge 客户端专用事件隔离 renderer/visual/fluid extensions；服务端不加载客户端类。新流体纹理继续引用已有 `block/fluid_soul_still`。
+- [x] 保持三个 Mixin 的目标方法与客户端专用 Basin 配置；按真实 Create 源修正参数或渲染调用，不增加服务端世界扫描。
+- [x] 整工程 `compileJava` 和原 42+新增边界 GameTest 全部通过后，GPT-6-sol（high）审查本任务；修复并提交。
 
 ### Task 5: 完整构建、运行验收、审查和整理
 
@@ -129,11 +129,11 @@
 - Create: `docs/neoforge-verification.md`，保存实际命令、测试数量、构建/JAR hash、依赖版本、运行成功标志、审查闭环和用户结果。
 - Local evidence: `build/` 日志、`run/` 独立新世界、`.local/` 临时资料归档，不提交依赖仓库/JDK/存档。
 
-- [ ] 执行 `gradlew build`，必须 `BUILD SUCCESSFUL`；检查 JAR 的 NeoForge 元数据、Java class major=65、新单数数据目录、资产哈希一致及无示例内容。
-- [ ] 执行 `gradlew runGameTestServer`，确认原 42 项没有缺失、新边界测试执行并全部通过，保留完整报告和退出码。
-- [ ] 执行 `gradlew runServer`，确认 Create/Goety/Curios/Patchouli 正确加载、`Done (...)!` 且无 Mixin apply failure；输入 stop 正常保存退出，核对无本任务残留服务端进程。
-- [ ] GPT-6-sol（high）审查完整 diff 和 spec/plan 覆盖；主 agent 修复所有阻塞问题并按受影响范围重验，不能用基线测试结果替代新版证据。
-- [ ] 真正启动 `runClient`，核对活跃进程与音频/渲染初始化证据；提供用户逐项测试清单和回复格式，按用户指令暂停工作，不使用 Computer Use。
-- [ ] 收到用户反馈后处理失败项并复验；全部确认后写验收记录。保留测试世界和原始诊断证据。
-- [ ] 最后检查每个目标交付项，更新 AGENTS 的“迁移中”状态、准确版本和查询工具用法；归档过时 Forge 资料、临时 probes 与重复准备产物，只整理本次产生的文件。
-- [ ] 核验 Git 分支/索引/工作区和构建产物，提交已验证改动，报告产物路径及验证结果；只有全部完成才标记整体 goal complete。
+- [x] 执行 `gradlew build`，必须 `BUILD SUCCESSFUL`；检查 JAR 的 NeoForge 元数据、Java class major=65、新单数数据目录、资产哈希一致及无示例内容。
+- [x] 执行 `gradlew runGameTestServer`，确认原 42 项没有缺失、新边界测试执行并全部通过，保留完整报告和退出码。
+- [x] 执行 `gradlew runServer`，确认 Create/Goety/Curios/Patchouli 正确加载、`Done (...)!` 且无 Mixin apply failure；输入 stop 正常保存退出，核对无本任务残留服务端进程。
+- [x] GPT-6-sol（high）审查完整 diff 和 spec/plan 覆盖；主 agent 修复所有阻塞问题并按受影响范围重验，不能用基线测试结果替代新版证据。
+- [x] 真正启动 `runClient`，核对活跃进程与音频/渲染初始化证据；提供用户逐项测试清单和回复格式，按用户指令暂停工作，不使用 Computer Use。
+- [x] 收到用户反馈后处理失败项并复验；全部确认后写验收记录。保留测试世界和原始诊断证据。
+- [x] 最后检查每个目标交付项，更新 AGENTS 的“迁移中”状态、准确版本和查询工具用法；归档过时 Forge 资料、临时 probes 与重复准备产物，只整理本次产生的文件。
+- [x] 核验 Git 分支/索引/工作区和构建产物，提交已验证改动，报告产物路径及验证结果；只有全部完成才标记整体 goal complete。

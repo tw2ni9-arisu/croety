@@ -40,7 +40,7 @@ NeoForge 1.21.1 使用 Java 21。不要把机器专属 JDK 路径写进仓库配
 - Patchouli 官方源码 checkout：`reference/patchouli/`，标签 `release-1.21.1-93`。
 - Goety 3.2.0 精确发行制品：`reference/artifacts/goety-3.2.0.jar`；授权维护仓库为 [Vivideru/Goety-3](https://github.com/Vivideru/Goety-3)，源码在 `reference/goety/src/main/java/`，锁定提交 `2f42435123d2e781107f41a14dadd0d59cbd64ea`。深入接口见 [`docs/ai/goety-3.2.0.md`](docs/ai/goety-3.2.0.md)。用户明确要求不再反编译。
 - `gradlew writeApiClasspath` 生成真实 `build/api-classpath.txt`（含 NeoForge/Minecraft 生成产物）。`tools/find-api.ps1` 查询此清单；`-Source` 优先读锁定的 reference 源码，再读同版本 sources JAR，不反编译 Goety。清单缺文件时重跑上述任务，不能查旧 Forge 缓存补空白。
-- `docs/ai/forge-1.20.1.md`、`docs/ai/create-6.0.8.md`、`docs/ai/goety-2.5.57.3.md` 和 `docs/ai/flywheel-ponder.md` 只可作旧版本背景资料；接口签名不能直接照搬。
+- [`docs/history/forge-1.20.1/ai/forge-1.20.1.md`](docs/history/forge-1.20.1/ai/forge-1.20.1.md)、[`docs/history/forge-1.20.1/ai/create-6.0.8.md`](docs/history/forge-1.20.1/ai/create-6.0.8.md)、[`docs/history/forge-1.20.1/ai/goety-2.5.57.3.md`](docs/history/forge-1.20.1/ai/goety-2.5.57.3.md) 和 [`docs/history/forge-1.20.1/ai/flywheel-ponder.md`](docs/history/forge-1.20.1/ai/flywheel-ponder.md) 是旧版背景资料；接口签名不能直接照搬，也不代表 NeoForge 验证结果。
 
 ## 固定依赖
 

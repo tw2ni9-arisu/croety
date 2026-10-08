@@ -40,10 +40,12 @@ javac -version
 此机还需把 Java 临时目录指向工作区，避免 Java 21 默认临时路径导致 Gradle 启动失败。下面设置只作用于当前 PowerShell 进程；每个新终端都要重新执行：
 
 ```powershell
-New-Item -ItemType Directory -Force build/javatmp | Out-Null
-$taskTemp = (Resolve-Path build/javatmp).Path.Replace('\', '/')
+New-Item -ItemType Directory -Force .local/javatmp | Out-Null
+$taskTemp = (Resolve-Path .local/javatmp).Path.Replace('\', '/')
 $env:JAVA_TOOL_OPTIONS = "-Duser.language=en -Duser.country=US -Dfile.encoding=UTF-8 -Djdk.net.unixdomain.tmpdir=$taskTemp"
 ```
+
+临时目录位于 `.local`，执行 `gradlew clean` 时也会保留。
 
 `libs/maven` 同样由 Git 忽略。fresh checkout 后，首次构建前先运行一次脚本，以恢复并校验 Goety 本地 Maven 制品：
 
@@ -64,7 +66,7 @@ $env:JAVA_TOOL_OPTIONS = "-Duser.language=en -Duser.country=US -Dfile.encoding=U
 
 1.21.1 数据资源使用单数目录：配方在 `src/main/resources/data/croety/recipe/`，物品标签在 `src/main/resources/data/croety/tags/item/`，结构模板在 `src/main/resources/data/croety/structure/`。
 
-`docs/ai/forge-1.20.1.md`、`docs/ai/create-6.0.8.md`、`docs/ai/goety-2.5.57.3.md` 和 `docs/ai/flywheel-ponder.md` 仅作旧版本背景参考；当前依赖和开发运行方式以本仓库的 1.21.1 配置及 [`docs/ai/neoforge-1.21.1.md`](docs/ai/neoforge-1.21.1.md) 为准。
+旧 Forge 1.20.1 资料已归档：[Forge 指南](docs/history/forge-1.20.1/ai/forge-1.20.1.md)、[Create 6.0.8 指南](docs/history/forge-1.20.1/ai/create-6.0.8.md)、[Goety 2.5.57.3 指南](docs/history/forge-1.20.1/ai/goety-2.5.57.3.md)、[Flywheel / Ponder 指南](docs/history/forge-1.20.1/ai/flywheel-ponder.md)。它们只作历史背景参考；当前依赖和开发运行方式以本仓库的 1.21.1 配置及 [`docs/ai/neoforge-1.21.1.md`](docs/ai/neoforge-1.21.1.md) 为准。历史验证记录见 [`docs/history/forge-1.20.1/README.md`](docs/history/forge-1.20.1/README.md)。
 
 ## 许可
 
