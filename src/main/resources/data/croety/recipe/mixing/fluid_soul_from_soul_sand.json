@@ -7,9 +7,9 @@
   ],
   "results": [
     {
-      "fluid": "croety:fluid_soul",
+      "id": "croety:fluid_soul",
       "amount": 25
     }
   ],
-  "heatRequirement": "heated"
+  "heat_requirement": "heated"
 }

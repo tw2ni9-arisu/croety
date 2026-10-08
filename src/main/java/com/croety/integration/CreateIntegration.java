@@ -8,32 +8,29 @@ import net.minecraft.world.level.block.Block;
 import org.slf4j.Logger;
 
 /**
- * Compile-time and runtime proof that the Create 6.0.8 API is on the classpath.
+ * 编译期和运行期确认 Create 6.0.10 API 可用。
  * <p>
- * Written against Create's own Maven artifact ({@code create-1.20.1:6.0.8-291:slim}),
- * deobfuscated by ForgeGradle through {@code fg.deobf(...)} in build.gradle.
+ * 使用 Create 官方 Maven 中的 1.21.1 slim 制品，并由 ModDevGradle 提供编译映射。
  */
 public final class CreateIntegration
 {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    /** Create's mod id ({@code Create.ID}). */
+    /** Create 的 mod id。 */
     public static final String MOD_ID = Create.ID;
 
     private CreateIntegration()
     {
     }
 
-    /** Builds a ResourceLocation in Create's namespace. */
+    /** 创建 Create 命名空间中的资源位置。 */
     public static ResourceLocation id(String path)
     {
         return Create.asResource(path);
     }
 
     /**
-     * Only call this once Create has finished registering its content, e.g. from
-     * {@code FMLCommonSetupEvent#enqueueWork}; the Registrate entries are not
-     * populated before that.
+     * Create 完成内容注册后再调用，避免在 Registrate 条目注册前读取。
      */
     public static void logEnvironment()
     {

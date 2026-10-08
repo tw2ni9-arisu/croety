@@ -2,8 +2,9 @@
   "type": "create:mixing",
   "ingredients": [
     {
-      "fluid": "croety:fluid_soul",
-      "amount": 25
+      "type": "neoforge:single",
+      "amount": 25,
+      "fluid": "croety:fluid_soul"
     },
     {
       "item": "minecraft:gold_ingot"
@@ -20,9 +21,9 @@
   ],
   "results": [
     {
-      "item": "goety:cursed_ingot",
+      "id": "goety:cursed_ingot",
       "count": 4
     }
   ],
-  "heatRequirement": "heated"
+  "heat_requirement": "heated"
 }

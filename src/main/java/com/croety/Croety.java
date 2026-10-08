@@ -6,19 +6,18 @@ import com.croety.content.motor.MotorContent;
 import com.croety.content.orb.OrbContent;
 import com.croety.integration.CreateIntegration;
 import com.croety.integration.GoetyIntegration;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod(Croety.MODID)
 public class Croety
 {
     public static final String MODID = "croety";
 
-    public Croety(FMLJavaModLoadingContext context)
+    public Croety(IEventBus modEventBus, ModContainer modContainer)
     {
-        IEventBus modEventBus = context.getModEventBus();
         OrbContent.register(modEventBus);
         SoulFluidContent.register(modEventBus);
         DemoTab.register(modEventBus);

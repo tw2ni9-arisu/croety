@@ -8,31 +8,29 @@ import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 
 /**
- * Compile-time and runtime proof that the Goety 2.5.57.3 API is on the classpath.
+ * 编译期和运行期确认 Goety 3.2.0 API 可用。
  * <p>
- * Goety is published to no Maven repository, so the release jar is staged in
- * {@code ./libs/maven} and deobfuscated by ForgeGradle through
- * {@code fg.deobf("com.polarice3:goety:2.5.57.3")}.
+ * Goety 没有公共 Maven；官方发行 JAR 经 hash 校验后暂存在 {@code ./libs/maven}。
  */
 public final class GoetyIntegration
 {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    /** Goety's mod id ({@code Goety.MOD_ID}). */
+    /** Goety 的 mod id。 */
     public static final String MOD_ID = Goety.MOD_ID;
 
     private GoetyIntegration()
     {
     }
 
-    /** Builds a ResourceLocation in Goety's namespace. */
+    /** 创建 Goety 命名空间中的资源位置。 */
     public static ResourceLocation id(String path)
     {
         return Goety.location(path);
     }
 
     /**
-     * Only call this once Goety has finished registering its content.
+     * Goety 完成内容注册后再调用。
      */
     public static void logEnvironment()
     {

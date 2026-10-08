@@ -11,5 +11,5 @@
     { "item": "create:windmill_bearing" },
     { "tag": "croety:waving_sails" }
   ],
-  "result": { "item": "croety:waving_focus" }
+  "result": { "id": "croety:waving_focus" }
 }

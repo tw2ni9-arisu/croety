@@ -1,52 +1,70 @@
 <#
 .SYNOPSIS
-    (Re)stages the mod jars that this workspace needs but that are not published
-    to any public Maven repository.
-
+    将 Goety 3.2.0 官方发行 JAR 校验后暂存到本地 Maven。
 .DESCRIPTION
-    Everything else (Create, Flywheel, Ponder, Registrate, MixinExtras, Curios,
-    Patchouli, JEI) is pulled by Gradle straight from its upstream Maven.
-
-    Goety is only distributed through Modrinth / CurseForge, so its release jar is
-    staged into ./libs/maven as a local Maven module that build.gradle resolves as
-    com.polarice3:goety:2.5.57.3 and deobfuscates with fg.deobf(...).
-
-    Run this if ./libs/maven is missing or you bump the Goety version.
-
-.NOTES
-    On networks that block CRL/OCSP endpoints, .NET needs revocation checking
-    disabled or the download fails with "The underlying connection was closed".
+    先复用 reference/artifacts 中已核验的官方发行 JAR；缺失时从固定 Modrinth
+    发行 URL 下载。SHA-256 必须匹配 SOURCES.md 中的记录，原始 JAR 不改包。
 #>
 [CmdletBinding()]
-param(
-    [string] $Version = '2.5.57.3',
-    [string] $Sha1    = 'f140a0d2bc17f518703088a170d72bf9570efcc6'
-)
+param()
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 [Net.ServicePointManager]::CheckCertificateRevocationList = $false
 
+$version = '3.2.0'
+$expectedSha256 = 'EDEEB623F626BC85BD26DF6458DBB440FD4B044F34F3DE78EE715CBC01E692D8'
+$url = 'https://cdn.modrinth.com/data/4ZVIxU8x/versions/8jB68vz3/goety-3.2.0.jar'
 $root = Split-Path -Parent $PSScriptRoot
-$dir  = Join-Path $root "libs\maven\com\polarice3\goety\$Version"
-New-Item -ItemType Directory -Force -Path $dir | Out-Null
+$referenceJar = Join-Path $root 'reference\artifacts\goety-3.2.0.jar'
+$artifactDir = Join-Path $root "libs\maven\com\polarice3\goety\$version"
+$targetJar = Join-Path $artifactDir "goety-$version.jar"
+$targetPom = Join-Path $artifactDir "goety-$version.pom"
+$downloadsDir = Join-Path $root '.local\downloads'
+$downloadJar = Join-Path $downloadsDir "goety-$version.jar"
 
-$jar = Join-Path $dir "goety-$Version.jar"
-$url = "https://cdn.modrinth.com/data/4ZVIxU8x/versions/jVtlXH2H/goety-$Version.jar"
+function Get-Sha256([string] $Path) {
+    (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
 
-if (Test-Path $jar) {
-    Write-Host "Already present: $jar"
+$sourceJar = $null
+if (Test-Path -LiteralPath $referenceJar) {
+    $referenceHash = Get-Sha256 $referenceJar
+    if ($referenceHash -eq $expectedSha256) {
+        $sourceJar = $referenceJar
+        Write-Host "Using verified release artifact: $referenceJar"
+    } else {
+        Write-Warning "Reference artifact hash mismatch; downloading the pinned official release."
+    }
+}
+
+if (-not $sourceJar) {
+    New-Item -ItemType Directory -Force -Path $downloadsDir | Out-Null
+    Write-Host "Downloading Goety $version from its pinned Modrinth release URL ..."
+    (New-Object System.Net.WebClient).DownloadFile($url, $downloadJar)
+    $downloadHash = Get-Sha256 $downloadJar
+    if ($downloadHash -ne $expectedSha256) {
+        throw "SHA-256 mismatch for downloaded Goety ${version}: expected $expectedSha256, got $downloadHash"
+    }
+    $sourceJar = $downloadJar
+}
+
+$sourceHash = Get-Sha256 $sourceJar
+if ($sourceHash -ne $expectedSha256) {
+    throw "SHA-256 mismatch for Goety ${version}: expected $expectedSha256, got $sourceHash"
+}
+
+New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
+if ((Test-Path -LiteralPath $targetJar) -and (Get-Sha256 $targetJar) -eq $expectedSha256) {
+    Write-Host "Verified local Maven artifact already present: $targetJar"
 } else {
-    Write-Host "Downloading Goety $Version ..."
-    (New-Object System.Net.WebClient).DownloadFile($url, $jar)
+    Copy-Item -LiteralPath $sourceJar -Destination $targetJar -Force
 }
-
-$actual = (Get-FileHash $jar -Algorithm SHA1).Hash.ToLower()
-if ($Sha1 -and $actual -ne $Sha1.ToLower()) {
-    throw "SHA1 mismatch for $jar - expected $Sha1 but got $actual"
+$stagedHash = Get-Sha256 $targetJar
+if ($stagedHash -ne $expectedSha256) {
+    throw "SHA-256 mismatch for staged Goety ${version}: expected $expectedSha256, got $stagedHash"
 }
-Write-Host "goety-$Version.jar OK ($([math]::Round((Get-Item $jar).Length / 1MB, 1)) MB, sha1 $actual)"
 
 $pom = @"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -56,34 +74,11 @@ $pom = @"
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.polarice3</groupId>
   <artifactId>goety</artifactId>
-  <version>$Version</version>
+  <version>$version</version>
   <packaging>jar</packaging>
   <name>Goety</name>
-  <description>Goety $Version for Minecraft 1.20.1 (Forge) - staged locally, no public Maven</description>
+  <description>Goety $version for Minecraft 1.21.1 NeoForge</description>
 </project>
 "@
-Set-Content -Path (Join-Path $dir "goety-$Version.pom") -Value $pom -Encoding UTF8
-
-# ---------------------------------------------------------------------------
-# Source jars. Create/Ponder/Flywheel publish sources to their Maven, and
-# tools/find-api.ps1 -Source prints them verbatim. Classes with no sources jar
-# (Goety, Curios, Patchouli) are decompiled on demand with ForgeFlower instead,
-# so nothing else needs downloading.
-# ---------------------------------------------------------------------------
-$srcDir = Join-Path $root 'libs\sources'
-New-Item -ItemType Directory -Force -Path $srcDir | Out-Null
-
-$sources = @{
-    'create-1.20.1-6.0.8-291-sources.jar'      = 'https://maven.createmod.net/com/simibubi/create/create-1.20.1/6.0.8-291/create-1.20.1-6.0.8-291-sources.jar'
-    'Ponder-Forge-1.20.1-1.0.91-sources.jar'   = 'https://maven.createmod.net/net/createmod/ponder/Ponder-Forge-1.20.1/1.0.91/Ponder-Forge-1.20.1-1.0.91-sources.jar'
-    'flywheel-forge-1.20.1-1.0.5-264-sources.jar' = 'https://maven.createmod.net/dev/engine-room/flywheel/flywheel-forge-1.20.1/1.0.5-264/flywheel-forge-1.20.1-1.0.5-264-sources.jar'
-}
-foreach ($name in $sources.Keys) {
-    $target = Join-Path $srcDir $name
-    if (Test-Path $target) { Write-Host "Already present: $name"; continue }
-    Write-Host "Downloading $name ..."
-    (New-Object System.Net.WebClient).DownloadFile($sources[$name], $target)
-    Write-Host "  -> $([math]::Round((Get-Item $target).Length / 1MB, 2)) MB"
-}
-
-Write-Host 'Done.'
+Set-Content -LiteralPath $targetPom -Value $pom -Encoding UTF8
+Write-Host "Goety $version staged and verified (SHA-256 $stagedHash)."
