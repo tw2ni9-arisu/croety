@@ -7,7 +7,7 @@
 | 项目 | 当前目标或本地来源 | 说明 |
 |---|---|---|
 | Minecraft / Java | 1.21.1 / Java 21 | NeoForge 官方 1.21.1 入门文档要求 JDK 21。 |
-| NeoForge / ModDevGradle / Parchment | 21.1.234 / 2.0.107 / 2024.11.17 | NeoForge 采用 Goety 3.2.0 源码使用的 21.1.234（Create 源码使用 21.1.219）；ModDevGradle/Parchment 与 Create 6.0.10 源码一致。目标工程当前仍是 ForgeGradle，尚未按目标配置验证。 |
+| NeoForge / ModDevGradle / Parchment | 21.1.234 / 2.0.107 / 2024.11.17 | NeoForge 采用 Goety 3.2.0 源码使用的 21.1.234（Create 源码使用 21.1.219）；ModDevGradle/Parchment 与 Create 6.0.10 源码一致。工程已切换并通过构建与44项GameTest，独立验证记录见 `docs/neoforge-verification.md`。 |
 | Create | 6.0.10 | 本地官方源码 `reference/create/`，标签 `mc1.21.1-6.0.10`；可用开发制品坐标为 `com.simibubi.create:create-1.21.1:6.0.10-281:slim`。该源码给出的配套版本为 Flywheel 1.0.6、Ponder 1.0.82（artifact 后缀 `+mc1.21.1`）、Registrate `MC1.21-1.3.0+67`。 |
 | Goety | 用户目标 3.2.00 对应发布版本 3.2.0 | 本地制品名为 `goety-3.2.0.jar`，SHA-256：`EDEEB623F626BC85BD26DF6458DBB440FD4B044F34F3DE78EE715CBC01E692D8`。源码为授权维护仓库 `Vivideru/Goety-3`，版本属性为 3.2.0；结合该制品 javap 核验，不改写发行 JAR。 |
 | Curios / Patchouli | Curios 9.5.1+1.21.1 / Patchouli 1.21.1-93-NEOFORGE | Goety 3.2.0 的元数据要求 Curios `[9.5.1,)`；Modrinth 发行把 Curios、Patchouli 都列为 required。本地参考源为 `reference/curios/` 分支 `1.21.1`、`reference/patchouli/` 标签 `release-1.21.1-93`。Croety 的最终依赖声明仍须和 Goety 发布文件、实际仓库坐标一致。 |
@@ -164,7 +164,7 @@ protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
 SoulOrb 直接继承 Entity，此处不调用抽象的 `super.defineSynchedData`；若是继承有具体实现的实体子类，则需调用其父类实现。授权源码的 `vehicle/SeatEntity.java` 展示了直接继承 Entity 的写法。客户端数据仍通过实体的 `entityData.get/set` 访问；实体自己的 accessor 必须用它自身 class 建立，不能混入其他实体类型。
 
-MC 1.21 的官方迁移 primer 将 `Entity#getAddEntityPacket()` 改为 `getAddEntityPacket(ServerEntity)`。当前 SoulOrb 使用的零参数 Forge `NetworkHooks.getEntitySpawningPacket` 不能直接移植。SoulOrb 的自定义 `VALUE` 使用 SynchedEntityData；只有额外 spawn payload 必要时才添加自定义初始化协议，并按 NeoForge 1.21.1 networking docs 实现。具体 packet 行为要在 `runServer` + 客户端跟踪实体时验证。
+MC 1.21 的官方迁移 primer 将 `Entity#getAddEntityPacket()` 改为 `getAddEntityPacket(ServerEntity)`。旧版 SoulOrb 的零参数 Forge `NetworkHooks.getEntitySpawningPacket` 已移除，当前继承 Entity 默认实现。SoulOrb 的自定义 `VALUE` 使用 SynchedEntityData，默认tracker在配对生成包后同步非默认字段；实际客户端画面仍由实机验收确认。
 
 ## 自定义流体与 NeoForge Capabilities
 
